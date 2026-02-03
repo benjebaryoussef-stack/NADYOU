@@ -68,6 +68,15 @@ export const LoginPage = () => {
                 className="mt-2"
                 placeholder="••••••••"
               />
+              <div className="text-right mt-2">
+                <Link
+                  data-testid="forgot-password-link"
+                  to="/forgot-password"
+                  className="text-sm text-primary hover:underline"
+                >
+                  Mot de passe oublié ?
+                </Link>
+              </div>
             </div>
 
             <Button
