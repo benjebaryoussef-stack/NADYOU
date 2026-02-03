@@ -183,12 +183,15 @@ export const WorkoutsPage = () => {
       </main>
 
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent data-testid="add-workout-dialog" className="bg-card border-border max-w-md">
+        <DialogContent data-testid="add-workout-dialog" className="bg-card border-border max-w-md" aria-describedby="workout-dialog-description">
           <DialogHeader>
             <DialogTitle className="font-heading font-bold text-xl">
               {selectedExercise ? selectedExercise.name : 'AJOUTER ENTRAÎNEMENT'}
             </DialogTitle>
           </DialogHeader>
+          <p id="workout-dialog-description" className="sr-only">
+            Formulaire pour enregistrer un entraînement avec séries, répétitions, poids et chronomètre
+          </p>
           <form onSubmit={handleSubmit} className="space-y-4">
             {!selectedExercise && (
               <div>
