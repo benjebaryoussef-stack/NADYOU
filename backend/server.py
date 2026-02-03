@@ -743,6 +743,93 @@ async def get_daily_recommendation(current_user: dict = Depends(get_current_user
     
     return recommendation
 
+@api_router.get("/nutrition/search")
+async def search_food(query: str, current_user: dict = Depends(get_current_user)):
+    """Recherche d'aliments dans la base USDA"""
+    if not query or len(query) < 2:
+        return {"results": []}
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://api.nal.usda.gov/fdc/v1/foods/search",
+                params={
+                    "api_key": "DEMO_KEY",
+                    "query": query,
+                    "dataType": ["SR Legacy", "Foundation"],
+                    "pageSize": 8
+                },
+                timeout=10.0
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                results = []
+                
+                for food in data.get("foods", []):
+                    results.append({
+                        "fdc_id": food.get("fdcId"),
+                        "name": food.get("description", ""),
+                        "brand": food.get("brandOwner", ""),
+                        "category": food.get("foodCategory", "")
+                    })
+                
+                return {"results": results}
+            else:
+                return {"results": []}
+    except Exception as e:
+        logger.error(f"USDA API error: {str(e)}")
+        return {"results": []}
+
+@api_router.get("/nutrition/details/{fdc_id}")
+async def get_food_details(fdc_id: int, current_user: dict = Depends(get_current_user)):
+    """Récupère les détails nutritionnels d'un aliment"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"https://api.nal.usda.gov/fdc/v1/food/{fdc_id}",
+                params={"api_key": "DEMO_KEY"},
+                timeout=10.0
+            )
+            
+            if response.status_code == 200:
+                food = response.json()
+                nutrients = {}
+                
+                nutrient_mapping = {
+                    "Energy": "calories",
+                    "Protein": "proteins",
+                    "Carbohydrate, by difference": "carbs",
+                    "Total lipid (fat)": "fats",
+                    "Leucine": "leucine",
+                    "Isoleucine": "isoleucine",
+                    "Valine": "valine"
+                }
+                
+                for nutrient in food.get("foodNutrients", []):
+                    nutrient_name = nutrient.get("nutrient", {}).get("name", "")
+                    
+                    for usda_name, our_name in nutrient_mapping.items():
+                        if usda_name.lower() in nutrient_name.lower():
+                            value = nutrient.get("amount", 0)
+                            
+                            if our_name == "calories":
+                                nutrients[our_name] = round(value, 1)
+                            else:
+                                nutrients[our_name] = round(value / 1000, 2) if value > 100 else round(value, 2)
+                
+                return {
+                    "name": food.get("description", ""),
+                    "nutrients": nutrients,
+                    "serving_size": food.get("servingSize", 100),
+                    "serving_unit": food.get("servingSizeUnit", "g")
+                }
+            else:
+                raise HTTPException(status_code=404, detail="Aliment non trouvé")
+    except Exception as e:
+        logger.error(f"USDA API error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Erreur lors de la récupération des données")
+
 app.include_router(api_router)
 
 app.add_middleware(
