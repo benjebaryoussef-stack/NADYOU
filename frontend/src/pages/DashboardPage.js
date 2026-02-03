@@ -23,15 +23,14 @@ export const DashboardPage = () => {
   const [nutritionStats, setNutritionStats] = useState(null);
   const [inspirationalPhrase] = useState(INSPIRATIONAL_PHRASES[Math.floor(Math.random() * INSPIRATIONAL_PHRASES.length)]);
 
+  // DEV MODE - Skip auth check
+  const mockUser = user || { name: 'Dev User', is_premium: true, onboarding_completed: true };
+
   useEffect(() => {
     if (user) {
-      if (!user.onboarding_completed) {
-        navigate('/onboarding');
-        return;
-      }
       loadStats();
     }
-  }, [user, navigate]);
+  }, [user]);
 
   const loadStats = async () => {
     try {
