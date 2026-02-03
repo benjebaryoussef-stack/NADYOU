@@ -258,6 +258,57 @@ async def update_profile(profile_data: ProfileUpdate, current_user: dict = Depen
     updated_user = await db.users.find_one({"id": current_user["id"]}, {"_id": 0})
     return UserResponse(**updated_user)
 
+@api_router.post("/auth/forgot-password")
+async def request_password_reset(request: PasswordResetRequest):
+    user = await db.users.find_one({"email": request.email})
+    
+    if not user:
+        return {"message": "Si cet email existe, un lien de réinitialisation a été envoyé"}
+    
+    reset_token = f"reset_{datetime.now(timezone.utc).timestamp()}_{user['id']}"
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+    
+    await db.password_resets.insert_one({
+        "token": reset_token,
+        "user_id": user["id"],
+        "email": request.email,
+        "expires_at": expires_at.isoformat(),
+        "used": False,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    logger.info(f"Password reset token for {request.email}: {reset_token}")
+    
+    return {"message": "Si cet email existe, un lien de réinitialisation a été envoyé"}
+
+@api_router.post("/auth/reset-password")
+async def reset_password(reset_data: PasswordReset):
+    reset_doc = await db.password_resets.find_one({
+        "token": reset_data.token,
+        "used": False
+    })
+    
+    if not reset_doc:
+        raise HTTPException(status_code=400, detail="Token invalide ou expiré")
+    
+    expires_at = datetime.fromisoformat(reset_doc["expires_at"])
+    if datetime.now(timezone.utc) > expires_at:
+        raise HTTPException(status_code=400, detail="Token expiré")
+    
+    hashed_pwd = hash_password(reset_data.new_password)
+    
+    await db.users.update_one(
+        {"id": reset_doc["user_id"]},
+        {"$set": {"password": hashed_pwd}}
+    )
+    
+    await db.password_resets.update_one(
+        {"token": reset_data.token},
+        {"$set": {"used": True, "used_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"message": "Mot de passe réinitialisé avec succès"}
+
 # Exercise Endpoints
 @api_router.get("/exercises", response_model=List[Exercise])
 async def get_exercises(current_user: dict = Depends(get_current_user)):
