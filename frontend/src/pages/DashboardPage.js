@@ -16,6 +16,10 @@ export const DashboardPage = () => {
 
   useEffect(() => {
     if (user) {
+      if (!user.onboarding_completed) {
+        navigate('/onboarding');
+        return;
+      }
       loadStats();
     }
   }, [user]);
