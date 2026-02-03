@@ -125,16 +125,13 @@ export const DashboardPage = () => {
           </Card>
 
           <Card 
-            data-testid="nav-card-progress"
+            data-testid="nav-card-mood"
             className="p-6 bg-card border-border hover:border-primary/50 cursor-pointer transition-colors duration-300"
-            onClick={() => navigate('/progress')}
+            onClick={() => navigate('/mood-tracker')}
           >
-            <TrendingUp className="w-10 h-10 text-primary mb-4" />
-            <h3 className="text-lg font-heading font-bold mb-1">Progression</h3>
-            <p className="text-2xl font-heading font-black text-primary">
-              {workoutStats?.total_sets || 0}
-            </p>
-            <p className="text-sm text-muted-foreground mt-1">séries total</p>
+            <Sparkles className="w-10 h-10 text-primary mb-4" />
+            <h3 className="text-lg font-heading font-bold mb-1">Mood & Energy</h3>
+            <p className="text-sm text-primary mt-2">Suivre votre bien-être</p>
           </Card>
 
           <Card 
@@ -142,7 +139,7 @@ export const DashboardPage = () => {
             className="p-6 bg-card border-border hover:border-primary/50 cursor-pointer transition-colors duration-300"
             onClick={() => navigate(user.is_premium ? '/ai' : '/premium')}
           >
-            <Sparkles className="w-10 h-10 text-primary mb-4" />
+            <Crown className="w-10 h-10 text-primary mb-4" />
             <h3 className="text-lg font-heading font-bold mb-1">IA Coach</h3>
             <p className="text-sm text-primary mt-2">
               {user.is_premium ? 'Actif' : 'Premium uniquement'}
