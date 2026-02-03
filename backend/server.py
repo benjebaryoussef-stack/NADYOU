@@ -129,7 +129,12 @@ class ProfileUpdate(BaseModel):
     age: Optional[int] = None
     height: Optional[float] = None
     weight: Optional[float] = None
+    sex: Optional[str] = None
     fitness_goal: Optional[str] = None
+    sport_relation: Optional[str] = None
+    training_frequency: Optional[int] = None
+    sleep_hours: Optional[float] = None
+    stress_level: Optional[str] = None
     onboarding_completed: Optional[bool] = None
 
 class PasswordResetRequest(BaseModel):
