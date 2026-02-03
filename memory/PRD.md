@@ -81,7 +81,7 @@ Application web complète de suivi de fitness avec intelligence artificielle, pe
 ## Design System
 
 ### Thème
-- **Mode** : Dark (thème "Performance Pro")
+- **Mode** : Dark (thème "NADYOU Performance")
 - **Philosophie** : Tactical Minimalism, High contrast
 - **Ton émotionnel** : Agressif, Discipliné, Élite
 
