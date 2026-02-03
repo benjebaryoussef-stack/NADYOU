@@ -653,6 +653,91 @@ async def get_mood_insights(current_user: dict = Depends(get_current_user)):
         "factor_counts": factor_counts
     }
 
+@api_router.get("/daily-recommendation")
+async def get_daily_recommendation(current_user: dict = Depends(get_current_user)):
+    today_mood = await db.mood_logs.find_one(
+        {"user_id": current_user["id"], "date": {"$gte": datetime.now(timezone.utc).replace(hour=0, minute=0, second=0).isoformat()}},
+        {"_id": 0},
+        sort=[("date", -1)]
+    )
+    
+    recent_workouts = await db.workout_logs.find(
+        {"user_id": current_user["id"]},
+        {"_id": 0}
+    ).sort("date", -1).limit(7).to_list(7)
+    
+    recommendation = {
+        "intensity": "moderate",
+        "message": "Séance modérée recommandée aujourd'hui.",
+        "suggestions": ["Entraînement équilibré", "Hydratation régulière"],
+        "type": "normal"
+    }
+    
+    if today_mood:
+        mood_level = today_mood.get("mood_level", 3)
+        energy_level = today_mood.get("energy_level", 3)
+        factors = today_mood.get("factors", [])
+        
+        sleep_hours = current_user.get("sleep_hours", 7)
+        stress_level = current_user.get("stress_level", "modéré")
+        
+        if "fatigue" in factors or sleep_hours < 6 or energy_level <= 2:
+            recommendation = {
+                "intensity": "low",
+                "message": "Ton sommeil a été insuffisant. Pour préserver tes performances et ta récupération, une baisse d'intensité est recommandée aujourd'hui.",
+                "suggestions": [
+                    "Séance courte (20-30 min)",
+                    "Mobilité douce",
+                    "Respiration guidée",
+                    "Yoga récupération"
+                ],
+                "type": "recovery",
+                "phrase": "Même une séance légère améliore la récupération nerveuse."
+            }
+        
+        elif "stress" in factors or stress_level == "élevé" or (mood_level <= 2 and energy_level <= 3):
+            recommendation = {
+                "intensity": "light",
+                "message": "Ton niveau de stress est élevé aujourd'hui. Le mouvement peut aider, à condition d'être contrôlé.",
+                "suggestions": [
+                    "Yoga flow doux",
+                    "Stretching profond",
+                    "Cardio léger (marche, vélo)",
+                    "Respiration cohérente"
+                ],
+                "type": "stress_management",
+                "phrase": "Le mouvement contrôlé apaise le système nerveux."
+            }
+        
+        elif mood_level >= 4 and energy_level >= 4 and sleep_hours >= 7:
+            recommendation = {
+                "intensity": "high",
+                "message": "Tu es dans une fenêtre favorable. C'est un bon moment pour une séance clé ou un travail de progression.",
+                "suggestions": [
+                    "Séance intensive",
+                    "Travail de force",
+                    "Progression technique",
+                    "Surcharge progressive"
+                ],
+                "type": "performance",
+                "phrase": "La constance dans les bons moments construit la progression."
+            }
+        
+        consecutive_low_mood = 0
+        for log in await db.mood_logs.find({"user_id": current_user["id"]}, {"_id": 0}).sort("date", -1).limit(3).to_list(3):
+            if log.get("mood_level", 3) <= 2:
+                consecutive_low_mood += 1
+        
+        if consecutive_low_mood >= 3:
+            recommendation["alert"] = "Une baisse d'humeur répétée a été détectée. Une adaptation de la charge est recommandée pour préserver la constance."
+    
+    workouts_this_week = len([w for w in recent_workouts if (datetime.now(timezone.utc) - datetime.fromisoformat(w["date"])).days <= 7])
+    
+    if workouts_this_week >= current_user.get("training_frequency", 3):
+        recommendation["note"] = f"Tu as déjà {workouts_this_week} entraînements cette semaine. Excellente régularité !"
+    
+    return recommendation
+
 app.include_router(api_router)
 
 app.add_middleware(
