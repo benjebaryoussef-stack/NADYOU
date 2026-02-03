@@ -11,7 +11,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from 'sonner';
 
 export const OnboardingPage = () => {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -30,6 +30,7 @@ export const OnboardingPage = () => {
         fitness_goal: formData.goal,
         onboarding_completed: true
       });
+      await refreshUser();
       toast.success('Profil complété avec succès !');
       navigate('/dashboard');
     } catch (error) {
