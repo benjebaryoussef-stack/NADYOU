@@ -1,0 +1,130 @@
+{
+  "design_strategy": {
+    "identity": "E1: The Anti-AI Designer",
+    "theme": "The Performance Pro (Elite Athleticism & Precision)",
+    "mode": "dark",
+    "core_philosophy": "Tactical Minimalism. High contrast, dense data, zero fluff. The interface should feel like a piece of high-end gym equipment.",
+    "emotional_tone": "Aggressive, Disciplined, Elite"
+  },
+  "typography": {
+    "headings": {
+      "font_family": "Barlow Condensed, sans-serif",
+      "weights": ["700", "800", "900"],
+      "usage": "All section headers, stats numbers, and hero text.",
+      "letter_spacing": "tracking-tight"
+    },
+    "body": {
+      "font_family": "Manrope, sans-serif",
+      "weights": ["400", "500", "600"],
+      "usage": "Paragraphs, labels, data tables.",
+      "letter_spacing": "tracking-normal"
+    },
+    "mono": {
+      "font_family": "JetBrains Mono, monospace",
+      "usage": "Timers, code snippets, specific data values."
+    },
+    "installation": "Import from Google Fonts: https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Manrope:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+  },
+  "colors": {
+    "palette": {
+      "background": "#09090B",
+      "foreground": "#FAFAFA",
+      "card": "#18181B",
+      "card_foreground": "#FAFAFA",
+      "popover": "#09090B",
+      "popover_foreground": "#FAFAFA",
+      "primary": "#F97316",
+      "primary_foreground": "#FAFAFA",
+      "secondary": "#27272A",
+      "secondary_foreground": "#FAFAFA",
+      "muted": "#27272A",
+      "muted_foreground": "#A1A1AA",
+      "accent": "#F97316",
+      "accent_foreground": "#FAFAFA",
+      "destructive": "#EF4444",
+      "destructive_foreground": "#FAFAFA",
+      "border": "#27272A",
+      "input": "#27272A",
+      "ring": "#F97316"
+    },
+    "chart_colors": {
+      "chart_1": "#F97316",
+      "chart_2": "#3B82F6",
+      "chart_3": "#10B981",
+      "chart_4": "#F59E0B",
+      "chart_5": "#8B5CF6"
+    },
+    "rules": [
+      "Use 'Electric Blaze' (#F97316) sparingly for CTAs and active states.",
+      "Backgrounds must be deep zinc/black, never pure black (#000000) unless for OLED optimization.",
+      "Borders should be subtle (1px solid #27272A).",
+      "NO GRADIENTS on buttons. Flat, high-contrast colors only."
+    ]
+  },
+  "layout": {
+    "grid_system": "Bento Grid (Mode B: High Density)",
+    "spacing": "Generous padding (p-6, p-8) inside containers, tight gaps (gap-4) between data points.",
+    "border_radius": "rounded-sm (2px) or rounded-none. Avoid large rounded corners.",
+    "container_style": "Flat background with 1px border. No shadows in dark mode, use border color changes for depth."
+  },
+  "components": {
+    "buttons": {
+      "style": "Sharp edges or pill-shaped. High contrast text.",
+      "hover": "Brightness up or subtle lift. No shadow."
+    },
+    "cards": {
+      "style": "bg-card border border-border. No shadow.",
+      "hover": "border-primary/50 transition-colors duration-300"
+    },
+    "inputs": {
+      "style": "bg-input border-transparent focus:border-primary focus:ring-1 focus:ring-primary rounded-sm"
+    },
+    "navigation": {
+      "style": "Sidebar or bottom nav (mobile). Glassmorphism allowed here only: backdrop-blur-xl bg-background/80 border-t border-white/10."
+    }
+  },
+  "visual_enhancers": {
+    "textures": "Use a subtle noise texture overlay on the background (opacity 0.03) to reduce digital flatness.",
+    "motion": "Fast, snappy transitions (0.2s ease-out). No slow drifts.",
+    "icons": "Phosphor Icons (Bold weight) or Lucide (default).",
+    "data_viz": "Use Recharts. Minimalist lines, glowing dots for current values."
+  },
+  "images": {
+    "hero_motivation": {
+      "url": "https://images.unsplash.com/photo-1754475118668-64ac3f3b2559?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Muscular athlete in dramatic lighting",
+      "usage": "Landing page hero, Profile header background"
+    },
+    "gym_atmosphere": {
+      "url": "https://images.unsplash.com/photo-1683758507025-6e74ad3ca1e5?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Dumbbells on gym floor",
+      "usage": "Workout log background, subtle overlay"
+    },
+    "nutrition_context": {
+      "url": "https://images.unsplash.com/photo-1588505617603-f80b72bf8f24?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Healthy vegetables in black bowl",
+      "usage": "Nutrition tracking section header"
+    },
+    "equipment_detail": {
+      "url": "https://images.unsplash.com/photo-1672344048213-76b6e77304bd?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Dumbbell close up black and white",
+      "usage": "Exercise library cards"
+    }
+  },
+  "instructions_to_main_agent": [
+    "1. INSTALL FONTS: Add the Google Fonts link to the <head> of index.html immediately.",
+    "2. CONFIGURE TAILWIND: Update tailwind.config.js to extend the font family with 'Barlow Condensed' and 'Manrope'.",
+    "3. OVERRIDE CSS VARS: Update index.css with the provided color palette variables for .dark class (and default root to dark values if forcing dark mode).",
+    "4. FORCE DARK MODE: Ensure the app defaults to dark mode. Add 'dark' class to html or body tag.",
+    "5. BUILD LAYOUTS: Use the 'Bento Grid' philosophy. Don't just stack divs. Create interesting asymmetrical grids.",
+    "6. USE SHADCN: Use the existing shadcn components but style them via className to match the 'Sharp/Tactical' aesthetic (remove rounded-lg, use rounded-sm).",
+    "7. DATA-TESTID: Add data-testid to all interactive elements.",
+    "8. NO LOREM IPSUM: Use realistic fitness data (e.g., 'Bench Press: 100kg', 'Protein: 180g')."
+  ],
+  "universal_guidelines": [
+    "Avoid 'AI Slop' - generic centered layouts.",
+    "Create depth through z-index and subtle borders, not heavy shadows.",
+    "Micro-animations on every interaction.",
+    "Use the provided image URLs. Do not use placeholders."
+  ]
+}
