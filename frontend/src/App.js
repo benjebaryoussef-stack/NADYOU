@@ -15,12 +15,13 @@ import { NutritionPage } from '@/pages/NutritionPage';
 import { ProgressPage } from '@/pages/ProgressPage';
 import { AIPage } from '@/pages/AIPage';
 import { PremiumPage } from '@/pages/PremiumPage';
+import { AIExplanationPage } from '@/pages/AIExplanationPage';
 import { MoodTrackerPage } from '@/pages/MoodTrackerPage';
 
 function App() {
   return (
     <AuthProvider>
-      <div className="App dark">
+      <div className="App">
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LandingPage />} />
@@ -34,6 +35,7 @@ function App() {
             <Route path="/nutrition" element={<NutritionPage />} />
             <Route path="/progress" element={<ProgressPage />} />
             <Route path="/ai" element={<AIPage />} />
+            <Route path="/ai/how-it-works" element={<AIExplanationPage />} />
             <Route path="/premium" element={<PremiumPage />} />
             <Route path="/premium/success" element={<PremiumPage />} />
             <Route path="/mood-tracker" element={<MoodTrackerPage />} />
