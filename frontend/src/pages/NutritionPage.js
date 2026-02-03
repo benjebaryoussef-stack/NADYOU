@@ -183,10 +183,13 @@ export const NutritionPage = () => {
       </main>
 
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent data-testid="add-meal-dialog" className="bg-card border-border max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent data-testid="add-meal-dialog" className="bg-card border-border max-w-md max-h-[90vh] overflow-y-auto" aria-describedby="meal-dialog-description">
           <DialogHeader>
             <DialogTitle className="font-heading font-bold text-xl">AJOUTER UN REPAS</DialogTitle>
           </DialogHeader>
+          <p id="meal-dialog-description" className="sr-only">
+            Formulaire pour enregistrer un repas avec calories, protéines, glucides, lipides et acides aminés
+          </p>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="meal_name">Nom du repas</Label>
