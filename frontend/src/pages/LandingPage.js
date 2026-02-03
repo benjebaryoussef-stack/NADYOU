@@ -164,7 +164,7 @@ export const LandingPage = () => {
 
       <footer className="border-t border-border bg-card py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-muted-foreground">
-          <p>© 2026 Performance Pro. Tous droits réservés.</p>
+          <p>© 2026 NADYOU Performance. Tous droits réservés.</p>
         </div>
       </footer>
     </div>
