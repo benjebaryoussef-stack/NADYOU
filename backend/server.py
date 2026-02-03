@@ -576,6 +576,7 @@ async def create_mood_entry(mood: MoodEntryCreate, current_user: dict = Depends(
         "mood_level": mood.mood_level,
         "energy_level": mood.energy_level,
         "notes": mood.notes,
+        "factors": mood.factors or [],
         "date": datetime.now(timezone.utc).isoformat()
     }
     
@@ -586,6 +587,66 @@ async def create_mood_entry(mood: MoodEntryCreate, current_user: dict = Depends(
 async def get_mood_history(current_user: dict = Depends(get_current_user), limit: int = 30):
     logs = await db.mood_logs.find({"user_id": current_user["id"]}, {"_id": 0}).sort("date", -1).limit(limit).to_list(limit)
     return [MoodEntryResponse(**log) for log in logs]
+
+@api_router.get("/mood/insights")
+async def get_mood_insights(current_user: dict = Depends(get_current_user)):
+    from_date = datetime.now(timezone.utc) - timedelta(days=30)
+    
+    mood_logs = await db.mood_logs.find(
+        {"user_id": current_user["id"], "date": {"$gte": from_date.isoformat()}},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    workout_logs = await db.workout_logs.find(
+        {"user_id": current_user["id"], "date": {"$gte": from_date.isoformat()}},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    if not mood_logs:
+        return {"message": "Pas encore assez de données"}
+    
+    avg_mood_7d = sum(m["mood_level"] for m in mood_logs[:7]) / min(len(mood_logs), 7)
+    avg_mood_30d = sum(m["mood_level"] for m in mood_logs) / len(mood_logs)
+    avg_energy_7d = sum(m["energy_level"] for m in mood_logs[:7]) / min(len(mood_logs), 7)
+    
+    workouts_by_date = {}
+    for w in workout_logs:
+        date = w["date"][:10]
+        workouts_by_date[date] = workouts_by_date.get(date, 0) + 1
+    
+    mood_on_workout_days = []
+    mood_on_rest_days = []
+    
+    for m in mood_logs:
+        date = m["date"][:10]
+        if date in workouts_by_date:
+            mood_on_workout_days.append(m["mood_level"])
+        else:
+            mood_on_rest_days.append(m["mood_level"])
+    
+    workout_mood_impact = 0
+    if mood_on_workout_days and mood_on_rest_days:
+        workout_mood_impact = (sum(mood_on_workout_days) / len(mood_on_workout_days)) - (sum(mood_on_rest_days) / len(mood_on_rest_days))
+    
+    factor_counts = {}
+    for m in mood_logs:
+        for factor in m.get("factors", []):
+            factor_counts[factor] = factor_counts.get(factor, 0) + 1
+    
+    most_common_factor = max(factor_counts.items(), key=lambda x: x[1])[0] if factor_counts else None
+    
+    return {
+        "avg_mood_7d": round(avg_mood_7d, 2),
+        "avg_mood_30d": round(avg_mood_30d, 2),
+        "avg_energy_7d": round(avg_energy_7d, 2),
+        "mood_trend": "hausse" if avg_mood_7d > avg_mood_30d else "baisse" if avg_mood_7d < avg_mood_30d else "stable",
+        "workout_mood_impact": round(workout_mood_impact, 2),
+        "total_entries": len(mood_logs),
+        "workout_days": len(mood_on_workout_days),
+        "rest_days": len(mood_on_rest_days),
+        "most_common_factor": most_common_factor,
+        "factor_counts": factor_counts
+    }
 
 app.include_router(api_router)
 
