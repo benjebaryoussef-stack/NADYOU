@@ -132,6 +132,13 @@ class ProfileUpdate(BaseModel):
     fitness_goal: Optional[str] = None
     onboarding_completed: Optional[bool] = None
 
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+class PasswordReset(BaseModel):
+    token: str
+    new_password: str
+
 class MoodEntryCreate(BaseModel):
     mood_level: int
     energy_level: int
