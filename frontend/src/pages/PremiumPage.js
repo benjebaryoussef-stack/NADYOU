@@ -132,7 +132,7 @@ export const PremiumPage = () => {
             <span className="text-primary block mt-2">PREMIUM</span>
           </h1>
           <p className="text-xl text-muted-foreground">
-            Débloquez tout le potentiel de Performance Pro
+            Débloquez tout le potentiel de NADYOU Performance
           </p>
         </div>
 
