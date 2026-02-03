@@ -43,6 +43,7 @@ export const api = {
   // Mood Tracker
   createMoodEntry: (data) => axios.post(`${API}/mood`, data, { headers: getAuthHeader() }),
   getMoodHistory: () => axios.get(`${API}/mood`, { headers: getAuthHeader() }),
+  getMoodInsights: () => axios.get(`${API}/mood/insights`, { headers: getAuthHeader() }),
 };
 
 export default api;
