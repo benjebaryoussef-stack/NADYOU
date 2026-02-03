@@ -262,11 +262,11 @@ class FitnessAPITester:
         
         success, response = self.make_request('POST', 'ai/recommendations', ai_request, 403)
         
-        if not success and response.get('detail') == 'Premium subscription required for AI recommendations':
+        if success and response.get('detail') == 'Premium subscription required for AI recommendations':
             self.log_test("AI Recommendations (Non-Premium)", True, "Correctly blocked non-premium user")
             return True
         else:
-            self.log_test("AI Recommendations (Non-Premium)", False, f"Expected 403, got: {response}")
+            self.log_test("AI Recommendations (Non-Premium)", False, f"Expected 403 with correct message, got: {response}")
             return False
 
     def test_stripe_checkout_creation(self) -> bool:
