@@ -238,6 +238,19 @@ async def login(credentials: UserLogin):
 async def get_me(current_user: dict = Depends(get_current_user)):
     return UserResponse(**current_user)
 
+@api_router.put("/auth/profile", response_model=UserResponse)
+async def update_profile(profile_data: ProfileUpdate, current_user: dict = Depends(get_current_user)):
+    update_fields = {k: v for k, v in profile_data.model_dump().items() if v is not None}
+    
+    if update_fields:
+        await db.users.update_one(
+            {"id": current_user["id"]},
+            {"$set": update_fields}
+        )
+    
+    updated_user = await db.users.find_one({"id": current_user["id"]}, {"_id": 0})
+    return UserResponse(**updated_user)
+
 # Exercise Endpoints
 @api_router.get("/exercises", response_model=List[Exercise])
 async def get_exercises(current_user: dict = Depends(get_current_user)):
