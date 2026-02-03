@@ -32,6 +32,13 @@ export const api = {
   // Payments
   createCheckout: (data) => axios.post(`${API}/payments/checkout`, data, { headers: getAuthHeader() }),
   getCheckoutStatus: (sessionId) => axios.get(`${API}/payments/checkout/status/${sessionId}`, { headers: getAuthHeader() }),
+  
+  // Profile
+  updateProfile: (data) => axios.put(`${API}/auth/profile`, data, { headers: getAuthHeader() }),
+  
+  // Mood Tracker
+  createMoodEntry: (data) => axios.post(`${API}/mood`, data, { headers: getAuthHeader() }),
+  getMoodHistory: () => axios.get(`${API}/mood`, { headers: getAuthHeader() }),
 };
 
 export default api;
