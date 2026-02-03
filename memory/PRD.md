@@ -1,4 +1,4 @@
-# Performance Pro - Application de Suivi de Fitness
+# NADYOU Performance - Application de Suivi de Fitness
 
 ## Vue d'ensemble
 Application web complète de suivi de fitness avec intelligence artificielle, permettant aux utilisateurs de suivre leurs entraînements de musculation, leur nutrition détaillée, leur progression et d'obtenir des recommandations personnalisées.
