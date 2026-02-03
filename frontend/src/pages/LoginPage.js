@@ -34,7 +34,7 @@ export const LoginPage = () => {
         <div className="text-center mb-8">
           <div className="flex justify-center items-center gap-2 mb-4">
             <Dumbbell className="w-10 h-10 text-primary" />
-            <span className="text-2xl font-heading font-bold">PERFORMANCE PRO</span>
+            <span className="text-2xl font-heading font-bold">NADYOU PERFORMANCE</span>
           </div>
           <h1 className="text-3xl font-heading font-black tracking-tight">CONNEXION</h1>
           <p className="text-muted-foreground mt-2">Accédez à votre espace</p>
