@@ -40,6 +40,15 @@ export const api = {
   requestPasswordReset: (data) => axios.post(`${API}/auth/forgot-password`, data),
   resetPassword: (data) => axios.post(`${API}/auth/reset-password`, data),
   
+  // Nutrition Search & Analysis
+  searchFood: (query) => axios.get(`${API}/nutrition/search`, { 
+    params: { query }, 
+    headers: getAuthHeader() 
+  }),
+  getFoodDetails: (fdcId) => axios.get(`${API}/nutrition/details/${fdcId}`, { 
+    headers: getAuthHeader() 
+  }),
+  
   // Mood Tracker
   createMoodEntry: (data) => axios.post(`${API}/mood`, data, { headers: getAuthHeader() }),
   getMoodHistory: () => axios.get(`${API}/mood`, { headers: getAuthHeader() }),
