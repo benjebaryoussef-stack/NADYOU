@@ -14,7 +14,7 @@ export const LandingPage = () => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
               <Dumbbell className="w-8 h-8 text-primary" />
-              <span className="text-xl font-heading font-bold tracking-tight">PERFORMANCE PRO</span>
+              <span className="text-xl font-heading font-bold tracking-tight">NADYOU PERFORMANCE</span>
             </div>
             
             <div className="hidden md:flex items-center gap-4">
