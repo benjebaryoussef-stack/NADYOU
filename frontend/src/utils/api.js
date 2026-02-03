@@ -36,6 +36,10 @@ export const api = {
   // Profile
   updateProfile: (data) => axios.put(`${API}/auth/profile`, data, { headers: getAuthHeader() }),
   
+  // Password Reset
+  requestPasswordReset: (data) => axios.post(`${API}/auth/forgot-password`, data),
+  resetPassword: (data) => axios.post(`${API}/auth/reset-password`, data),
+  
   // Mood Tracker
   createMoodEntry: (data) => axios.post(`${API}/mood`, data, { headers: getAuthHeader() }),
   getMoodHistory: () => axios.get(`${API}/mood`, { headers: getAuthHeader() }),
