@@ -125,6 +125,27 @@ class CheckoutRequest(BaseModel):
     package_id: str
     origin_url: str
 
+class ProfileUpdate(BaseModel):
+    age: Optional[int] = None
+    height: Optional[float] = None
+    weight: Optional[float] = None
+    fitness_goal: Optional[str] = None
+    onboarding_completed: Optional[bool] = None
+
+class MoodEntryCreate(BaseModel):
+    mood_level: int
+    energy_level: int
+    notes: Optional[str] = None
+
+class MoodEntryResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    user_id: str
+    mood_level: int
+    energy_level: int
+    notes: Optional[str] = None
+    date: str
+
 # Helper Functions
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
