@@ -143,6 +143,7 @@ class MoodEntryCreate(BaseModel):
     mood_level: int
     energy_level: int
     notes: Optional[str] = None
+    factors: Optional[List[str]] = None
 
 class MoodEntryResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -151,6 +152,7 @@ class MoodEntryResponse(BaseModel):
     mood_level: int
     energy_level: int
     notes: Optional[str] = None
+    factors: Optional[List[str]] = None
     date: str
 
 # Helper Functions
