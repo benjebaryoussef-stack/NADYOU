@@ -22,7 +22,7 @@ export const DashboardPage = () => {
       }
       loadStats();
     }
-  }, [user]);
+  }, [user, navigate]);
 
   const loadStats = async () => {
     try {
