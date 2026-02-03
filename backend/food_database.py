@@ -110,4 +110,13 @@ FRENCH_FOODS_DB = [
     {"id": "jus-orange", "name": "Jus d'orange", "category": "Boissons", "calories": 45, "proteins": 0.7, "carbs": 10, "fats": 0.2, "leucine": 0.03, "isoleucine": 0.02, "valine": 0.03},
     {"id": "jus-pomme", "name": "Jus de pomme", "category": "Boissons", "calories": 46, "proteins": 0.1, "carbs": 11, "fats": 0.1, "leucine": 0.01, "isoleucine": 0.01, "valine": 0.01},
     {"id": "smoothie", "name": "Smoothie", "category": "Boissons", "calories": 65, "proteins": 1.5, "carbs": 15, "fats": 0.5, "leucine": 0.1, "isoleucine": 0.05, "valine": 0.08},
-]
+
+    # Proteines végétales
+    {"id":"tofu","name":"Tofu","category":"Végétal","unit":"100g","calories":76,"proteins":8,"carbs":1.9,"fats":4.8,"leucine":0.6},
+    {"id":"tempeh","name":"Tempeh","category":"Végétal","unit":"100g","calories":193,"proteins":19,"carbs":9,"fats":11,"leucine":1.4},
+    {"id":"lentilles","name":"Lentilles cuites","category":"Végétal","unit":"100g","calories":116,"proteins":9,"carbs":20,"fats":0.4,"leucine":0.7},
+    {"id":"pois-chiches","name":"Pois chiches","category":"Végétal","unit":"100g","calories":164,"proteins":9,"carbs":27,"fats":2.6,"leucine":0.6}   
+
+    # Compléments
+    {"id":"whey","name":"Whey protéine","category":"Suppléments","unit":"100g","calories":400,"proteins":80,"carbs":7,"fats":6,"leucine":8.6},
+    {"id":"caseine","name":"Caséine","category":"Suppléments","unit":"100g","calories":360,"proteins":78,"carbs":8,"fats":3,"leucine":8.0} ,

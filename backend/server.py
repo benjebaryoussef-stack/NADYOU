@@ -754,11 +754,17 @@ async def search_food(query: str, current_user: dict = Depends(get_current_user)
     if not query or len(query) < 1:
         return {"results": []}
     
-    query_lower = query.lower()
+    # Normaliser la recherche (enlever accents et mettre en minuscules)
+    import unicodedata
+    def normalize(text):
+        return ''.join(c for c in unicodedata.normalize('NFD', text.lower()) if unicodedata.category(c) != 'Mn')
+    
+    query_normalized = normalize(query)
     results = []
     
     for food in FRENCH_FOODS_DB:
-        if food["name"].lower().startswith(query_lower):
+        food_name_normalized = normalize(food["name"])
+        if food_name_normalized.startswith(query_normalized):
             results.append({
                 "fdc_id": food["id"],
                 "name": food["name"],
