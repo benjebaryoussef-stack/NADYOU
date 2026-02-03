@@ -505,6 +505,28 @@ async def get_progress_overview(current_user: dict = Depends(get_current_user)):
         "total_meals_logged": len(nutrition)
     }
 
+# Mood Tracker Endpoints
+@api_router.post("/mood", response_model=MoodEntryResponse)
+async def create_mood_entry(mood: MoodEntryCreate, current_user: dict = Depends(get_current_user)):
+    mood_id = f"mood_{datetime.now(timezone.utc).timestamp()}"
+    
+    mood_doc = {
+        "id": mood_id,
+        "user_id": current_user["id"],
+        "mood_level": mood.mood_level,
+        "energy_level": mood.energy_level,
+        "notes": mood.notes,
+        "date": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.mood_logs.insert_one(mood_doc)
+    return MoodEntryResponse(**mood_doc)
+
+@api_router.get("/mood", response_model=List[MoodEntryResponse])
+async def get_mood_history(current_user: dict = Depends(get_current_user), limit: int = 30):
+    logs = await db.mood_logs.find({"user_id": current_user["id"]}, {"_id": 0}).sort("date", -1).limit(limit).to_list(limit)
+    return [MoodEntryResponse(**log) for log in logs]
+
 app.include_router(api_router)
 
 app.add_middleware(
