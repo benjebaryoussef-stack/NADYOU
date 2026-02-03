@@ -16,10 +16,14 @@ from emergentintegrations.payments.stripe.checkout import StripeCheckout, Checko
 import httpx
 from openai import OpenAI
 import base64
-from backend.food_database import FRENCH_FOODS_DB
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+# Import de la base de données française
+import sys
+sys.path.insert(0, str(ROOT_DIR))
+from food_database import FRENCH_FOODS_DB
 
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
