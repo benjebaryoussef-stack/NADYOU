@@ -51,6 +51,11 @@ class UserResponse(BaseModel):
     name: str
     is_premium: bool = False
     created_at: str
+    age: Optional[int] = None
+    height: Optional[float] = None
+    weight: Optional[float] = None
+    fitness_goal: Optional[str] = None
+    onboarding_completed: bool = False
 
 class TokenResponse(BaseModel):
     access_token: str
