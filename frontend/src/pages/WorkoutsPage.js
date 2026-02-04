@@ -188,7 +188,7 @@ export const WorkoutsPage = () => {
         </div>
 
         {/* Statistiques */}
-        <div className="grid md:grid-cols-4 gap-4 mb-8">
+        <div className="grid md:grid-cols-3 gap-4 mb-8">
           <Card className="p-6 bg-white border border-border">
             <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Exercices (7j)</p>
             <p className="text-3xl font-light text-primary">{stats.totalWorkouts}</p>
@@ -200,10 +200,6 @@ export const WorkoutsPage = () => {
           <Card className="p-6 bg-white border border-border">
             <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Répétitions</p>
             <p className="text-3xl font-light text-primary">{stats.totalReps}</p>
-          </Card>
-          <Card className="p-6 bg-white border border-border">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Volume (kg)</p>
-            <p className="text-3xl font-light text-primary">{Math.round(stats.totalVolume).toLocaleString()}</p>
           </Card>
         </div>
 
