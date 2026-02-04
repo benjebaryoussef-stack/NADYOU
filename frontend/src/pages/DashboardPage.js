@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Dumbbell, Apple, TrendingUp, Sparkles, User, LogOut, Heart, Target } from 'lucide-react';
+import { Dumbbell, Apple, TrendingUp, Sparkles, User, LogOut, Heart, Target, Zap, ArrowRight, Flame, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
@@ -30,7 +30,7 @@ export const DashboardPage = () => {
   const currentUser = user || demoUser;
 
   // Objectifs nutritionnels (stockés localement)
-  const [goals, setGoals] = useState(() => {
+  const [goals] = useState(() => {
     const saved = localStorage.getItem('nutritionGoals');
     return saved ? JSON.parse(saved) : { calories: 2000, proteins: 150, carbs: 250, fats: 70 };
   });
@@ -96,43 +96,38 @@ export const DashboardPage = () => {
     return Math.min((current / goal) * 100, 100);
   };
 
-  const getProgressColor = (percent) => {
-    if (percent >= 100) return 'bg-green-500';
-    if (percent >= 75) return 'bg-yellow-500';
-    return 'bg-primary';
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 flex items-center justify-center">
         <div className="text-center">
-          <Dumbbell className="w-12 h-12 text-primary animate-pulse mx-auto mb-4" />
-          <p className="text-muted-foreground font-light">Chargement...</p>
+          <Dumbbell className="w-12 h-12 text-white animate-pulse mx-auto mb-4" />
+          <p className="text-white/80 font-light">Chargement...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <nav className="border-b border-border bg-white/50 backdrop-blur-xl sticky top-0 z-50">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header avec gradient coloré */}
+      <nav className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <Dumbbell className="w-5 h-5 text-primary" strokeWidth={1.5} />
+              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+                <Dumbbell className="w-6 h-6 text-white" strokeWidth={2} />
               </div>
-              <span className="text-lg font-medium tracking-tight text-foreground">NADYOU</span>
+              <span className="text-xl font-bold text-white tracking-tight">NADYOU</span>
             </div>
             
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-sm">
-                <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
-                  <User className="w-4 h-4 text-foreground" strokeWidth={1.5} />
+                <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
+                  <User className="w-5 h-5 text-white" strokeWidth={2} />
                 </div>
-                <span className="hidden sm:inline font-medium">{currentUser.name}</span>
+                <span className="hidden sm:inline font-medium text-white">{currentUser.name}</span>
                 {currentUser.is_premium && (
-                  <span className="px-2 py-1 bg-accent/10 text-accent text-xs rounded-full font-medium">Premium</span>
+                  <span className="px-2 py-1 bg-yellow-400 text-yellow-900 text-xs rounded-full font-bold">PRO</span>
                 )}
               </div>
               <Button
@@ -140,243 +135,342 @@ export const DashboardPage = () => {
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-white/80 hover:text-white hover:bg-white/10"
               >
-                <LogOut className="w-4 h-4" strokeWidth={1.5} />
+                <LogOut className="w-5 h-5" strokeWidth={2} />
               </Button>
             </div>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-12 fade-in">
-          <h1 className="text-4xl font-light text-foreground mb-3 tracking-tight">
-            Bonjour, {currentUser.name}
-          </h1>
-          <p className="text-lg text-muted-foreground font-light italic">
-            "{inspirationalPhrase}"
-          </p>
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 pb-32 pt-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2">
+                Bonjour, {currentUser.name} 👋
+              </h1>
+              <p className="text-lg text-purple-200 font-light italic">
+                "{inspirationalPhrase}"
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                onClick={() => navigate('/workouts')}
+                className="bg-white text-purple-700 hover:bg-purple-50 font-semibold shadow-lg"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Nouvel entraînement
+              </Button>
+              <Button
+                onClick={() => navigate('/nutrition')}
+                variant="outline"
+                className="border-2 border-white text-white hover:bg-white/10 font-semibold"
+              >
+                <Apple className="w-4 h-4 mr-2" />
+                Ajouter un repas
+              </Button>
+            </div>
+          </div>
         </div>
+      </div>
 
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24">
         {/* Objectifs du jour avec barres de progression */}
-        <Card className="p-6 bg-white border border-border mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Target className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-medium">Objectifs du jour</h2>
+        <Card className="p-6 bg-white border-0 shadow-xl rounded-2xl mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center">
+                <Flame className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">Objectifs du jour</h2>
+                <p className="text-sm text-gray-500">Reste focus sur tes macros</p>
+              </div>
+            </div>
+            <Button 
+              variant="ghost" 
+              className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 font-semibold"
+              onClick={() => navigate('/nutrition')}
+            >
+              Voir détails <ArrowRight className="w-4 h-4 ml-1" />
+            </Button>
           </div>
           <div className="grid md:grid-cols-4 gap-6">
             {/* Calories */}
-            <div>
+            <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Calories</span>
-                <span className="font-medium">{Math.round(nutritionStats.today_calories)} / {goals.calories}</span>
+                <span className="font-medium text-gray-700">Calories</span>
+                <span className="font-bold text-orange-600">{Math.round(nutritionStats.today_calories)} / {goals.calories}</span>
               </div>
-              <div className="h-3 bg-secondary rounded-full overflow-hidden">
+              <div className="h-3 bg-white rounded-full overflow-hidden shadow-inner">
                 <div 
-                  className={`h-full ${getProgressColor(getProgressPercent(nutritionStats.today_calories, goals.calories))} transition-all duration-500`}
+                  className="h-full bg-gradient-to-r from-orange-400 to-red-500 transition-all duration-500 rounded-full"
                   style={{ width: `${getProgressPercent(nutritionStats.today_calories, goals.calories)}%` }}
                 />
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-gray-500 mt-2">
                 {Math.max(0, Math.round(goals.calories - nutritionStats.today_calories))} restantes
               </p>
             </div>
 
             {/* Protéines */}
-            <div>
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Protéines</span>
-                <span className="font-medium">{Math.round(nutritionStats.today_proteins)}g / {goals.proteins}g</span>
+                <span className="font-medium text-gray-700">Protéines</span>
+                <span className="font-bold text-blue-600">{Math.round(nutritionStats.today_proteins)}g / {goals.proteins}g</span>
               </div>
-              <div className="h-3 bg-secondary rounded-full overflow-hidden">
+              <div className="h-3 bg-white rounded-full overflow-hidden shadow-inner">
                 <div 
-                  className={`h-full ${getProgressColor(getProgressPercent(nutritionStats.today_proteins, goals.proteins))} transition-all duration-500`}
+                  className="h-full bg-gradient-to-r from-blue-400 to-indigo-500 transition-all duration-500 rounded-full"
                   style={{ width: `${getProgressPercent(nutritionStats.today_proteins, goals.proteins)}%` }}
                 />
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-gray-500 mt-2">
                 {Math.max(0, Math.round(goals.proteins - nutritionStats.today_proteins))}g restants
               </p>
             </div>
 
             {/* Glucides */}
-            <div>
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Glucides</span>
-                <span className="font-medium">{Math.round(nutritionStats.today_carbs)}g / {goals.carbs}g</span>
+                <span className="font-medium text-gray-700">Glucides</span>
+                <span className="font-bold text-green-600">{Math.round(nutritionStats.today_carbs)}g / {goals.carbs}g</span>
               </div>
-              <div className="h-3 bg-secondary rounded-full overflow-hidden">
+              <div className="h-3 bg-white rounded-full overflow-hidden shadow-inner">
                 <div 
-                  className={`h-full ${getProgressColor(getProgressPercent(nutritionStats.today_carbs, goals.carbs))} transition-all duration-500`}
+                  className="h-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-500 rounded-full"
                   style={{ width: `${getProgressPercent(nutritionStats.today_carbs, goals.carbs)}%` }}
                 />
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-gray-500 mt-2">
                 {Math.max(0, Math.round(goals.carbs - nutritionStats.today_carbs))}g restants
               </p>
             </div>
 
             {/* Lipides */}
-            <div>
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Lipides</span>
-                <span className="font-medium">{Math.round(nutritionStats.today_fats)}g / {goals.fats}g</span>
+                <span className="font-medium text-gray-700">Lipides</span>
+                <span className="font-bold text-purple-600">{Math.round(nutritionStats.today_fats)}g / {goals.fats}g</span>
               </div>
-              <div className="h-3 bg-secondary rounded-full overflow-hidden">
+              <div className="h-3 bg-white rounded-full overflow-hidden shadow-inner">
                 <div 
-                  className={`h-full ${getProgressColor(getProgressPercent(nutritionStats.today_fats, goals.fats))} transition-all duration-500`}
+                  className="h-full bg-gradient-to-r from-purple-400 to-pink-500 transition-all duration-500 rounded-full"
                   style={{ width: `${getProgressPercent(nutritionStats.today_fats, goals.fats)}%` }}
                 />
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-gray-500 mt-2">
                 {Math.max(0, Math.round(goals.fats - nutritionStats.today_fats))}g restants
               </p>
             </div>
           </div>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        {/* Cartes de navigation */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card 
             data-testid="nav-card-workouts"
-            className="p-8 bg-white border border-border hover:border-primary/50 cursor-pointer transition-all duration-300 hover:shadow-lg group"
+            className="p-6 bg-gradient-to-br from-purple-500 to-indigo-600 border-0 shadow-lg hover:shadow-xl cursor-pointer transition-all duration-300 hover:scale-105 rounded-2xl group"
             onClick={() => navigate('/workouts')}
           >
-            <div className="flex items-center justify-between mb-6">
-              <Dumbbell className="w-8 h-8 text-primary group-hover:scale-110 transition-transform" strokeWidth={1.5} />
-              <span className="text-3xl font-light text-foreground">{workoutStats.total_workouts}</span>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                <Dumbbell className="w-6 h-6 text-white" strokeWidth={2} />
+              </div>
+              <span className="text-4xl font-bold text-white">{workoutStats.total_workouts}</span>
             </div>
-            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Entraînements (7j)</h3>
+            <h3 className="text-sm font-semibold text-white/80 uppercase tracking-wide">Entraînements</h3>
+            <p className="text-xs text-white/60 mt-1">7 derniers jours</p>
+            <div className="mt-4 flex items-center text-white/80 text-sm font-medium group-hover:text-white">
+              Commencer <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </div>
           </Card>
 
           <Card 
             data-testid="nav-card-nutrition"
-            className="p-8 bg-white border border-border hover:border-primary/50 cursor-pointer transition-all duration-300 hover:shadow-lg group"
+            className="p-6 bg-gradient-to-br from-green-500 to-emerald-600 border-0 shadow-lg hover:shadow-xl cursor-pointer transition-all duration-300 hover:scale-105 rounded-2xl group"
             onClick={() => navigate('/nutrition')}
           >
-            <div className="flex items-center justify-between mb-6">
-              <Apple className="w-8 h-8 text-primary group-hover:scale-110 transition-transform" strokeWidth={1.5} />
-              <span className="text-3xl font-light text-foreground">{nutritionStats.meal_count}</span>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                <Apple className="w-6 h-6 text-white" strokeWidth={2} />
+              </div>
+              <span className="text-4xl font-bold text-white">{nutritionStats.meal_count}</span>
             </div>
-            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Repas suivis</h3>
+            <h3 className="text-sm font-semibold text-white/80 uppercase tracking-wide">Repas suivis</h3>
+            <p className="text-xs text-white/60 mt-1">Total enregistré</p>
+            <div className="mt-4 flex items-center text-white/80 text-sm font-medium group-hover:text-white">
+              Ajouter <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </div>
           </Card>
 
           <Card 
             data-testid="nav-card-mood"
-            className="p-8 bg-white border border-border hover:border-primary/50 cursor-pointer transition-all duration-300 hover:shadow-lg group"
+            className="p-6 bg-gradient-to-br from-pink-500 to-rose-600 border-0 shadow-lg hover:shadow-xl cursor-pointer transition-all duration-300 hover:scale-105 rounded-2xl group"
             onClick={() => navigate('/mood-tracker')}
           >
-            <div className="flex items-center justify-between mb-6">
-              <Heart className="w-8 h-8 text-primary group-hover:scale-110 transition-transform" strokeWidth={1.5} />
-              <Sparkles className="w-6 h-6 text-muted-foreground" strokeWidth={1.5} />
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                <Heart className="w-6 h-6 text-white" strokeWidth={2} />
+              </div>
+              <Sparkles className="w-8 h-8 text-white/60" strokeWidth={2} />
             </div>
-            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Bien-être</h3>
+            <h3 className="text-sm font-semibold text-white/80 uppercase tracking-wide">Bien-être</h3>
+            <p className="text-xs text-white/60 mt-1">Suivi quotidien</p>
+            <div className="mt-4 flex items-center text-white/80 text-sm font-medium group-hover:text-white">
+              Logger <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </div>
           </Card>
 
           <Card 
             data-testid="nav-card-progress"
-            className="p-8 bg-white border border-border hover:border-primary/50 cursor-pointer transition-all duration-300 hover:shadow-lg group"
+            className="p-6 bg-gradient-to-br from-orange-500 to-amber-600 border-0 shadow-lg hover:shadow-xl cursor-pointer transition-all duration-300 hover:scale-105 rounded-2xl group"
             onClick={() => navigate('/progress')}
           >
-            <div className="flex items-center justify-between mb-6">
-              <TrendingUp className="w-8 h-8 text-primary group-hover:scale-110 transition-transform" strokeWidth={1.5} />
-              <span className="text-3xl font-light text-foreground">{workoutStats.total_sets}</span>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-white" strokeWidth={2} />
+              </div>
+              <span className="text-4xl font-bold text-white">{workoutStats.total_sets}</span>
             </div>
-            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Séries totales</h3>
+            <h3 className="text-sm font-semibold text-white/80 uppercase tracking-wide">Séries totales</h3>
+            <p className="text-xs text-white/60 mt-1">Performance</p>
+            <div className="mt-4 flex items-center text-white/80 text-sm font-medium group-hover:text-white">
+              Analyser <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </div>
           </Card>
         </div>
 
+        {/* Section Premium CTA */}
         {!currentUser.is_premium && (
-          <Card data-testid="premium-upsell" className="p-10 bg-gradient-to-br from-accent/5 via-white to-accent/5 border border-accent/20 mb-12 slide-up">
-            <div className="flex items-start justify-between">
+          <Card data-testid="premium-upsell" className="p-8 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 border-0 shadow-xl rounded-2xl mb-8 overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-accent" strokeWidth={1.5} />
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                    <Trophy className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-2xl font-light">Accès Premium</h3>
+                  <span className="px-3 py-1 bg-white/20 text-white text-sm font-bold rounded-full">OFFRE LIMITÉE</span>
                 </div>
-                <p className="text-muted-foreground font-light mb-6 max-w-2xl leading-relaxed">
-                  Débloquez l'analyse IA approfondie, les recommandations personnalisées et les insights psycho-sportifs avancés.
+                <h3 className="text-3xl font-bold text-white mb-2">Passe au niveau supérieur 🚀</h3>
+                <p className="text-white/90 font-medium max-w-xl">
+                  Débloquez l'analyse IA, les recommandations personnalisées et les insights avancés pour exploser tes performances.
                 </p>
-                <Button
-                  data-testid="premium-upgrade-btn"
-                  className="bg-accent hover:bg-accent/90 text-white"
-                  onClick={() => navigate('/premium')}
-                >
-                  Découvrir Premium
-                </Button>
               </div>
+              <Button
+                data-testid="premium-upgrade-btn"
+                className="bg-white text-orange-600 hover:bg-orange-50 font-bold text-lg px-8 py-6 shadow-lg"
+                onClick={() => navigate('/premium')}
+              >
+                <Sparkles className="w-5 h-5 mr-2" />
+                Devenir Premium
+              </Button>
             </div>
           </Card>
         )}
 
-        <div className="grid md:grid-cols-2 gap-8">
-          <Card data-testid="quick-stats" className="p-8 bg-white border border-border">
-            <h3 className="text-xl font-medium mb-6 text-foreground">Vue d'ensemble (7 jours)</h3>
-            <div className="space-y-6">
-              <div className="flex justify-between items-center pb-4 border-b border-border">
-                <span className="text-sm text-muted-foreground font-light">Exercice favori</span>
-                <span className="font-medium text-foreground">{workoutStats.favorite_exercise}</span>
+        {/* Stats et Actions */}
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          <Card data-testid="quick-stats" className="p-6 bg-white border-0 shadow-lg rounded-2xl">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-white" />
               </div>
-              <div className="flex justify-between items-center pb-4 border-b border-border">
-                <span className="text-sm text-muted-foreground font-light">Calories moy./jour</span>
-                <span className="font-medium text-foreground">{Math.round(nutritionStats.avg_daily_calories)}</span>
+              <h3 className="text-xl font-bold text-gray-900">Vue d'ensemble</h3>
+            </div>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                <span className="text-sm text-gray-600">Exercice favori</span>
+                <span className="font-bold text-gray-900">{workoutStats.favorite_exercise}</span>
               </div>
-              <div className="flex justify-between items-center pb-4 border-b border-border">
-                <span className="text-sm text-muted-foreground font-light">Protéines totales</span>
-                <span className="font-medium text-foreground">{Math.round(nutritionStats.total_proteins)}g</span>
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                <span className="text-sm text-gray-600">Calories moy./jour</span>
+                <span className="font-bold text-gray-900">{Math.round(nutritionStats.avg_daily_calories)}</span>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground font-light">Répétitions totales</span>
-                <span className="font-medium text-foreground">{workoutStats.total_reps}</span>
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                <span className="text-sm text-gray-600">Protéines (7j)</span>
+                <span className="font-bold text-gray-900">{Math.round(nutritionStats.total_proteins)}g</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                <span className="text-sm text-gray-600">Répétitions totales</span>
+                <span className="font-bold text-gray-900">{workoutStats.total_reps}</span>
               </div>
             </div>
           </Card>
 
-          <Card data-testid="quick-actions" className="p-8 bg-white border border-border">
-            <h3 className="text-xl font-medium mb-6 text-foreground">Actions rapides</h3>
+          <Card data-testid="quick-actions" className="p-6 bg-white border-0 shadow-lg rounded-2xl">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                <Zap className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900">Actions rapides</h3>
+            </div>
             <div className="space-y-3">
               <Button
                 data-testid="quick-action-workout"
-                className="w-full justify-start bg-secondary/50 hover:bg-secondary text-foreground font-normal"
-                variant="ghost"
+                className="w-full justify-between bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-semibold py-4 rounded-xl"
                 onClick={() => navigate('/workouts')}
               >
-                <Dumbbell className="w-4 h-4 mr-3 text-primary" strokeWidth={1.5} />
-                Enregistrer un entraînement
+                <div className="flex items-center">
+                  <Dumbbell className="w-5 h-5 mr-3" />
+                  Enregistrer un entraînement
+                </div>
+                <ArrowRight className="w-5 h-5" />
               </Button>
               <Button
                 data-testid="quick-action-nutrition"
-                className="w-full justify-start bg-secondary/50 hover:bg-secondary text-foreground font-normal"
-                variant="ghost"
+                className="w-full justify-between bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-4 rounded-xl"
                 onClick={() => navigate('/nutrition')}
               >
-                <Apple className="w-4 h-4 mr-3 text-primary" strokeWidth={1.5} />
-                Ajouter un repas
+                <div className="flex items-center">
+                  <Apple className="w-5 h-5 mr-3" />
+                  Ajouter un repas
+                </div>
+                <ArrowRight className="w-5 h-5" />
               </Button>
               <Button
                 data-testid="quick-action-mood"
-                className="w-full justify-start bg-secondary/50 hover:bg-secondary text-foreground font-normal"
-                variant="ghost"
+                className="w-full justify-between bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-semibold py-4 rounded-xl"
                 onClick={() => navigate('/mood-tracker')}
               >
-                <Heart className="w-4 h-4 mr-3 text-primary" strokeWidth={1.5} />
-                Logger mon humeur
-              </Button>
-              <Button
-                data-testid="quick-action-progress"
-                className="w-full justify-start bg-secondary/50 hover:bg-secondary text-foreground font-normal"
-                variant="ghost"
-                onClick={() => navigate('/progress')}
-              >
-                <TrendingUp className="w-4 h-4 mr-3 text-primary" strokeWidth={1.5} />
-                Voir ma progression
+                <div className="flex items-center">
+                  <Heart className="w-5 h-5 mr-3" />
+                  Logger mon humeur
+                </div>
+                <ArrowRight className="w-5 h-5" />
               </Button>
             </div>
           </Card>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-8 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center">
+                <Dumbbell className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold">NADYOU</span>
+            </div>
+            <p className="text-gray-400 text-sm">Performance physique et équilibre émotionnel</p>
+            <div className="flex gap-4">
+              <Button variant="ghost" className="text-gray-400 hover:text-white" onClick={() => navigate('/premium')}>
+                Premium
+              </Button>
+              <Button variant="ghost" className="text-gray-400 hover:text-white" onClick={() => navigate('/progress')}>
+                Progression
+              </Button>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
