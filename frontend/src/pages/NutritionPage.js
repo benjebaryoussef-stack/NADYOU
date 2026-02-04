@@ -1,13 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Apple, Plus, ArrowLeft, Search, X, Trash2, RefreshCw } from 'lucide-react';
+import { Apple, Plus, ArrowLeft, Search, X, Trash2, RefreshCw, Coffee, Sun, Moon, Cookie } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { searchFoods, FRENCH_FOODS_DB } from '@/data/foodDatabase';
+import { searchFoods } from '@/data/foodDatabase';
+
+const MEAL_TYPES = [
+  { id: 'petit-dejeuner', name: 'Petit-déjeuner', icon: Coffee, color: 'text-orange-500', bgColor: 'bg-orange-50' },
+  { id: 'dejeuner', name: 'Déjeuner', icon: Sun, color: 'text-yellow-500', bgColor: 'bg-yellow-50' },
+  { id: 'diner', name: 'Dîner', icon: Moon, color: 'text-blue-500', bgColor: 'bg-blue-50' },
+  { id: 'collation', name: 'Collation', icon: Cookie, color: 'text-purple-500', bgColor: 'bg-purple-50' },
+];
 
 export const NutritionPage = () => {
   const navigate = useNavigate();
@@ -17,8 +24,15 @@ export const NutritionPage = () => {
     const saved = localStorage.getItem('nutritionMeals');
     return saved ? JSON.parse(saved) : [];
   });
+
+  // Objectifs nutritionnels
+  const [goals] = useState(() => {
+    const saved = localStorage.getItem('nutritionGoals');
+    return saved ? JSON.parse(saved) : { calories: 2000, proteins: 150, carbs: 250, fats: 70 };
+  });
   
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [selectedMealType, setSelectedMealType] = useState('petit-dejeuner');
   
   // États pour la recherche
   const [searchQuery, setSearchQuery] = useState('');
@@ -56,8 +70,22 @@ export const NutritionPage = () => {
     }
   }, [searchQuery, selectedFood]);
 
+  // Calculer les statistiques du jour
+  const getTodayStats = () => {
+    const today = new Date().toDateString();
+    const todayMeals = meals.filter(meal => new Date(meal.date).toDateString() === today);
+    
+    return {
+      calories: todayMeals.reduce((sum, m) => sum + m.calories, 0),
+      proteins: todayMeals.reduce((sum, m) => sum + m.proteins, 0),
+      carbs: todayMeals.reduce((sum, m) => sum + m.carbs, 0),
+      fats: todayMeals.reduce((sum, m) => sum + m.fats, 0),
+      meal_count: todayMeals.length
+    };
+  };
+
   // Calculer les statistiques sur 7 jours
-  const calculateStats = () => {
+  const getWeekStats = () => {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     
@@ -72,7 +100,17 @@ export const NutritionPage = () => {
     };
   };
 
-  const stats = calculateStats();
+  // Obtenir les repas d'aujourd'hui par type
+  const getTodayMealsByType = (mealTypeId) => {
+    const today = new Date().toDateString();
+    return meals.filter(meal => 
+      new Date(meal.date).toDateString() === today && 
+      meal.meal_type === mealTypeId
+    );
+  };
+
+  const todayStats = getTodayStats();
+  const weekStats = getWeekStats();
 
   // Calculer les nutriments en fonction de la quantité
   const calculateNutrients = () => {
@@ -123,6 +161,7 @@ export const NutritionPage = () => {
       meal_name: `${selectedFood.name} (${quantity}g)`,
       food_name: selectedFood.name,
       category: selectedFood.category,
+      meal_type: selectedMealType,
       quantity: parseFloat(quantity),
       calories: calc.calories,
       proteins: calc.proteins,
@@ -135,7 +174,8 @@ export const NutritionPage = () => {
     };
 
     setMeals(prev => [newMeal, ...prev]);
-    toast.success(`${quantity}g de ${selectedFood.name} ajouté !`);
+    const mealTypeName = MEAL_TYPES.find(t => t.id === selectedMealType)?.name || 'Repas';
+    toast.success(`${quantity}g de ${selectedFood.name} ajouté au ${mealTypeName} !`);
     resetForm();
   };
 
@@ -145,11 +185,10 @@ export const NutritionPage = () => {
     toast.success('Repas supprimé');
   };
 
-  // Remplacer un repas (ouvre le dialog avec l'aliment pré-sélectionné pour modification)
+  // Remplacer un repas
   const handleReplaceMeal = (meal) => {
-    // Supprimer l'ancien repas
     setMeals(prev => prev.filter(m => m.id !== meal.id));
-    // Ouvrir le dialog pour ajouter un nouveau
+    setSelectedMealType(meal.meal_type || 'petit-dejeuner');
     setShowAddDialog(true);
     toast.info('Sélectionnez un nouvel aliment');
   };
@@ -160,6 +199,17 @@ export const NutritionPage = () => {
     setSelectedFood(null);
     setQuantity('100');
     setSearchResults([]);
+  };
+
+  // Calcul du pourcentage pour les barres de progression
+  const getProgressPercent = (current, goal) => {
+    return Math.min((current / goal) * 100, 100);
+  };
+
+  const getProgressColor = (percent) => {
+    if (percent >= 100) return 'bg-green-500';
+    if (percent >= 75) return 'bg-yellow-500';
+    return 'bg-primary';
   };
 
   return (
@@ -186,7 +236,7 @@ export const NutritionPage = () => {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex justify-between items-center mb-12">
+        <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-light text-foreground mb-2">Ma nutrition</h1>
             <p className="text-sm text-muted-foreground font-light">Suivi quotidien des macronutriments</p>
@@ -201,100 +251,243 @@ export const NutritionPage = () => {
           </Button>
         </div>
 
-        {/* Statistiques */}
-        <div className="grid md:grid-cols-4 gap-6 mb-12">
-          <Card data-testid="stat-calories" className="p-8 bg-white border border-border">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium">Calories (7j)</p>
-            <p className="text-4xl font-light text-foreground">
-              {Math.round(stats.total_calories)}
-            </p>
-          </Card>
-          <Card data-testid="stat-proteins" className="p-8 bg-white border border-border">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium">Protéines (7j)</p>
-            <p className="text-4xl font-light text-foreground">
-              {Math.round(stats.total_proteins)}<span className="text-xl text-muted-foreground">g</span>
-            </p>
-          </Card>
-          <Card data-testid="stat-carbs" className="p-8 bg-white border border-border">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium">Glucides (7j)</p>
-            <p className="text-4xl font-light text-foreground">
-              {Math.round(stats.total_carbs)}<span className="text-xl text-muted-foreground">g</span>
-            </p>
-          </Card>
-          <Card data-testid="stat-fats" className="p-8 bg-white border border-border">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium">Lipides (7j)</p>
-            <p className="text-4xl font-light text-foreground">
-              {Math.round(stats.total_fats)}<span className="text-xl text-muted-foreground">g</span>
-            </p>
-          </Card>
+        {/* Objectifs du jour avec barres de progression */}
+        <Card className="p-6 bg-white border border-border mb-8">
+          <h2 className="text-lg font-medium mb-4">Objectifs du jour</h2>
+          <div className="grid md:grid-cols-4 gap-6">
+            {/* Calories */}
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-muted-foreground">Calories</span>
+                <span className="font-medium">{Math.round(todayStats.calories)} / {goals.calories}</span>
+              </div>
+              <div className="h-3 bg-secondary rounded-full overflow-hidden">
+                <div 
+                  className={`h-full ${getProgressColor(getProgressPercent(todayStats.calories, goals.calories))} transition-all duration-500`}
+                  style={{ width: `${getProgressPercent(todayStats.calories, goals.calories)}%` }}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {Math.round(goals.calories - todayStats.calories)} restantes
+              </p>
+            </div>
+
+            {/* Protéines */}
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-muted-foreground">Protéines</span>
+                <span className="font-medium">{Math.round(todayStats.proteins)}g / {goals.proteins}g</span>
+              </div>
+              <div className="h-3 bg-secondary rounded-full overflow-hidden">
+                <div 
+                  className={`h-full ${getProgressColor(getProgressPercent(todayStats.proteins, goals.proteins))} transition-all duration-500`}
+                  style={{ width: `${getProgressPercent(todayStats.proteins, goals.proteins)}%` }}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {Math.round(goals.proteins - todayStats.proteins)}g restants
+              </p>
+            </div>
+
+            {/* Glucides */}
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-muted-foreground">Glucides</span>
+                <span className="font-medium">{Math.round(todayStats.carbs)}g / {goals.carbs}g</span>
+              </div>
+              <div className="h-3 bg-secondary rounded-full overflow-hidden">
+                <div 
+                  className={`h-full ${getProgressColor(getProgressPercent(todayStats.carbs, goals.carbs))} transition-all duration-500`}
+                  style={{ width: `${getProgressPercent(todayStats.carbs, goals.carbs)}%` }}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {Math.round(goals.carbs - todayStats.carbs)}g restants
+              </p>
+            </div>
+
+            {/* Lipides */}
+            <div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-muted-foreground">Lipides</span>
+                <span className="font-medium">{Math.round(todayStats.fats)}g / {goals.fats}g</span>
+              </div>
+              <div className="h-3 bg-secondary rounded-full overflow-hidden">
+                <div 
+                  className={`h-full ${getProgressColor(getProgressPercent(todayStats.fats, goals.fats))} transition-all duration-500`}
+                  style={{ width: `${getProgressPercent(todayStats.fats, goals.fats)}%` }}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {Math.round(goals.fats - todayStats.fats)}g restants
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        {/* Repas du jour par type */}
+        <h2 className="text-xl font-medium mb-4">Repas du jour</h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {MEAL_TYPES.map(mealType => {
+            const MealIcon = mealType.icon;
+            const typeMeals = getTodayMealsByType(mealType.id);
+            const typeCalories = typeMeals.reduce((sum, m) => sum + m.calories, 0);
+            const typeProteins = typeMeals.reduce((sum, m) => sum + m.proteins, 0);
+
+            return (
+              <Card key={mealType.id} className={`p-4 border border-border ${mealType.bgColor}`}>
+                <div className="flex items-center gap-2 mb-3">
+                  <MealIcon className={`w-5 h-5 ${mealType.color}`} />
+                  <h3 className="font-medium">{mealType.name}</h3>
+                </div>
+                
+                {typeMeals.length > 0 ? (
+                  <div className="space-y-2">
+                    {typeMeals.map(meal => (
+                      <div key={meal.id} className="flex justify-between items-center text-sm bg-white/50 rounded p-2">
+                        <span className="truncate flex-1">{meal.food_name}</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-muted-foreground">{Math.round(meal.calories)} kcal</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteMeal(meal.id)}
+                            className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="pt-2 border-t border-border/50 text-sm">
+                      <span className="font-medium">{Math.round(typeCalories)} kcal</span>
+                      <span className="text-muted-foreground ml-2">• {Math.round(typeProteins)}g prot.</span>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">Aucun aliment</p>
+                )}
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedMealType(mealType.id);
+                    setShowAddDialog(true);
+                  }}
+                  className={`w-full mt-2 ${mealType.color} hover:bg-white/50`}
+                >
+                  <Plus className="w-4 h-4 mr-1" /> Ajouter
+                </Button>
+              </Card>
+            );
+          })}
         </div>
+
+        {/* Statistiques de la semaine */}
+        <Card className="p-6 bg-white border border-border mb-8">
+          <h2 className="text-lg font-medium mb-4">Statistiques (7 derniers jours)</h2>
+          <div className="grid md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <p className="text-3xl font-light text-primary">{Math.round(weekStats.total_calories)}</p>
+              <p className="text-sm text-muted-foreground">Calories totales</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-light text-primary">{Math.round(weekStats.total_proteins)}g</p>
+              <p className="text-sm text-muted-foreground">Protéines totales</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-light text-primary">{Math.round(weekStats.total_carbs)}g</p>
+              <p className="text-sm text-muted-foreground">Glucides totaux</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-light text-primary">{Math.round(weekStats.total_fats)}g</p>
+              <p className="text-sm text-muted-foreground">Lipides totaux</p>
+            </div>
+          </div>
+        </Card>
 
         {/* Historique des repas */}
         <Card data-testid="nutrition-logs" className="p-8 bg-white border border-border">
-          <h2 className="text-xl font-medium mb-6">Historique des repas</h2>
+          <h2 className="text-xl font-medium mb-6">Historique complet</h2>
           <div className="space-y-4">
-            {meals.map((meal) => (
-              <div
-                key={meal.id}
-                data-testid={`nutrition-log-${meal.id}`}
-                className="p-6 bg-secondary/30 rounded-lg border border-border hover:border-primary/30 transition-colors"
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="font-medium text-foreground">{meal.meal_name}</h3>
-                    <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-full">
-                      {meal.category}
-                    </span>
+            {meals.slice(0, 20).map((meal) => {
+              const mealTypeInfo = MEAL_TYPES.find(t => t.id === meal.meal_type);
+              const MealIcon = mealTypeInfo?.icon || Apple;
+              
+              return (
+                <div
+                  key={meal.id}
+                  data-testid={`nutrition-log-${meal.id}`}
+                  className="p-4 bg-secondary/30 rounded-lg border border-border hover:border-primary/30 transition-colors"
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${mealTypeInfo?.bgColor || 'bg-secondary'}`}>
+                        <MealIcon className={`w-4 h-4 ${mealTypeInfo?.color || 'text-muted-foreground'}`} />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-foreground">{meal.meal_name}</h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
+                            {meal.category}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {mealTypeInfo?.name || 'Repas'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(meal.date).toLocaleDateString('fr-FR', { 
+                          day: 'numeric', 
+                          month: 'short',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleReplaceMeal(meal)}
+                        className="text-muted-foreground hover:text-primary h-8 w-8 p-0"
+                        title="Remplacer"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteMeal(meal.id)}
+                        className="text-muted-foreground hover:text-destructive h-8 w-8 p-0"
+                        title="Supprimer"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground mr-2">
-                      {new Date(meal.date).toLocaleDateString('fr-FR', { 
-                        day: 'numeric', 
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleReplaceMeal(meal)}
-                      className="text-muted-foreground hover:text-primary h-8 w-8 p-0"
-                      title="Remplacer"
-                    >
-                      <RefreshCw className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteMeal(meal.id)}
-                      className="text-muted-foreground hover:text-destructive h-8 w-8 p-0"
-                      title="Supprimer"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                  <div className="grid grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <span className="text-muted-foreground">Calories</span>
+                      <span className="ml-2 text-primary font-medium">{Math.round(meal.calories)}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Protéines</span>
+                      <span className="ml-2 text-primary font-medium">{Math.round(meal.proteins)}g</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Glucides</span>
+                      <span className="ml-2 text-primary font-medium">{Math.round(meal.carbs)}g</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Lipides</span>
+                      <span className="ml-2 text-primary font-medium">{Math.round(meal.fats)}g</span>
+                    </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <span className="text-muted-foreground font-light">Calories</span>
-                    <span className="ml-2 text-primary font-medium">{Math.round(meal.calories)}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground font-light">Protéines</span>
-                    <span className="ml-2 text-primary font-medium">{Math.round(meal.proteins)}g</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground font-light">Glucides</span>
-                    <span className="ml-2 text-primary font-medium">{Math.round(meal.carbs)}g</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground font-light">Lipides</span>
-                    <span className="ml-2 text-primary font-medium">{Math.round(meal.fats)}g</span>
-                  </div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
             {meals.length === 0 && (
               <p className="text-muted-foreground text-center py-12 font-light">
                 Aucun repas enregistré. Cliquez sur "Ajouter un repas" pour commencer.
@@ -312,13 +505,41 @@ export const NutritionPage = () => {
           aria-describedby="meal-dialog-description"
         >
           <DialogHeader>
-            <DialogTitle className="text-2xl font-light">Ajouter un repas</DialogTitle>
+            <DialogTitle className="text-2xl font-light">Ajouter un aliment</DialogTitle>
           </DialogHeader>
           <p id="meal-dialog-description" className="sr-only">
             Recherchez un aliment et les nutriments seront calculés automatiquement
           </p>
           
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Sélection du type de repas */}
+            <div>
+              <Label className="text-sm font-medium mb-3 block">Type de repas</Label>
+              <div className="grid grid-cols-4 gap-2">
+                {MEAL_TYPES.map(mealType => {
+                  const MealIcon = mealType.icon;
+                  const isSelected = selectedMealType === mealType.id;
+                  return (
+                    <button
+                      key={mealType.id}
+                      type="button"
+                      onClick={() => setSelectedMealType(mealType.id)}
+                      className={`p-3 rounded-lg border-2 transition-all flex flex-col items-center gap-1 ${
+                        isSelected 
+                          ? `${mealType.bgColor} border-current ${mealType.color}` 
+                          : 'border-border hover:border-muted-foreground'
+                      }`}
+                    >
+                      <MealIcon className={`w-5 h-5 ${isSelected ? mealType.color : 'text-muted-foreground'}`} />
+                      <span className={`text-xs ${isSelected ? 'font-medium' : 'text-muted-foreground'}`}>
+                        {mealType.name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Barre de recherche */}
             <div className="relative" ref={searchRef}>
               <Label className="text-sm font-medium mb-2 block">Rechercher un aliment</Label>
@@ -375,12 +596,6 @@ export const NutritionPage = () => {
                       </div>
                     </div>
                   ))}
-                </div>
-              )}
-              
-              {showDropdown && searchResults.length === 0 && searchQuery.length >= 1 && (
-                <div className="absolute z-50 w-full mt-2 bg-white border border-border rounded-lg shadow-xl p-4">
-                  <p className="text-sm text-muted-foreground text-center">Aucun résultat trouvé</p>
                 </div>
               )}
             </div>
@@ -450,35 +665,6 @@ export const NutritionPage = () => {
                       </p>
                     </div>
                   </div>
-
-                  {/* Acides aminés BCAA */}
-                  {calculated && (calculated.leucine > 0 || calculated.isoleucine > 0 || calculated.valine > 0) && (
-                    <div className="pt-4 border-t border-border">
-                      <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
-                        Acides aminés (BCAA)
-                      </h4>
-                      <div className="grid grid-cols-3 gap-3">
-                        {calculated.leucine > 0 && (
-                          <div className="p-3 bg-white rounded-lg border border-border">
-                            <p className="text-xs text-muted-foreground">Leucine</p>
-                            <p className="text-lg font-medium text-primary">{calculated.leucine.toFixed(2)}g</p>
-                          </div>
-                        )}
-                        {calculated.isoleucine > 0 && (
-                          <div className="p-3 bg-white rounded-lg border border-border">
-                            <p className="text-xs text-muted-foreground">Isoleucine</p>
-                            <p className="text-lg font-medium text-primary">{calculated.isoleucine.toFixed(2)}g</p>
-                          </div>
-                        )}
-                        {calculated.valine > 0 && (
-                          <div className="p-3 bg-white rounded-lg border border-border">
-                            <p className="text-xs text-muted-foreground">Valine</p>
-                            <p className="text-lg font-medium text-primary">{calculated.valine.toFixed(2)}g</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 <Button
@@ -486,7 +672,7 @@ export const NutritionPage = () => {
                   type="submit"
                   className="w-full bg-primary hover:bg-primary/90 text-lg py-6"
                 >
-                  Enregistrer ce repas
+                  Ajouter au {MEAL_TYPES.find(t => t.id === selectedMealType)?.name}
                 </Button>
               </div>
             )}
