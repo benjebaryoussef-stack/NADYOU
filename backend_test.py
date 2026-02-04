@@ -11,7 +11,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 
 class FitnessAPITester:
-    def __init__(self, base_url: str = "https://mon-coach-fitness-1.preview.emergentagent.com"):
+    def __init__(self, base_url: str = "https://quick-preview-90.preview.emergentagent.com"):
         self.base_url = base_url
         self.token = None
         self.user_data = None
@@ -273,7 +273,7 @@ class FitnessAPITester:
         """Test Stripe checkout session creation"""
         checkout_data = {
             "package_id": "monthly",
-            "origin_url": "https://mon-coach-fitness-1.preview.emergentagent.com"
+            "origin_url": "https://quick-preview-90.preview.emergentagent.com"
         }
         
         success, response = self.make_request('POST', 'payments/checkout', checkout_data, 200)

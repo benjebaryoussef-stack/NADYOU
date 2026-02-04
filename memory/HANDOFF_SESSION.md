@@ -1,7 +1,7 @@
 # 📋 HANDOFF COMPLET - NADYOU Performance
 
 **Date :** 3 février 2026  
-**URL App :** https://mon-coach-fitness-1.preview.emergentagent.com  
+**URL App :** https://quick-preview-90.preview.emergentagent.com  
 **Workspace :** /app
 
 ---
@@ -444,7 +444,7 @@ curl "$API_URL/api/nutrition/search?query=poulet" -H "Authorization: Bearer TOKE
 
 - [ ] Lire ce document complet
 - [ ] Vérifier que services tournent (`supervisorctl status`)
-- [ ] Tester URL app : https://mon-coach-fitness-1.preview.emergentagent.com
+- [ ] Tester URL app : https://quick-preview-90.preview.emergentagent.com
 - [ ] Tester endpoint search : `GET /api/nutrition/search?query=poulet`
 - [ ] Ouvrir `/app/frontend/src/pages/NutritionPage.js`
 - [ ] Commencer implémentation autocomplétion
