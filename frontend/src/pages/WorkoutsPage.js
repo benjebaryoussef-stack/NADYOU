@@ -149,72 +149,70 @@ export const WorkoutsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <nav className="border-b border-border bg-white/50 backdrop-blur-xl sticky top-0 z-50">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header coloré */}
+      <nav className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-16 gap-4">
-            <Button
-              data-testid="back-to-dashboard-btn"
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/dashboard')}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" strokeWidth={1.5} />
-              Retour
-            </Button>
-            <div className="flex items-center gap-2">
-              <Dumbbell className="w-6 h-6 text-primary" strokeWidth={1.5} />
-              <span className="text-lg font-medium">Entraînements</span>
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
+              <Button
+                data-testid="back-to-dashboard-btn"
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/dashboard')}
+                className="text-white/80 hover:text-white hover:bg-white/10"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" strokeWidth={2} />
+                Retour
+              </Button>
             </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                <Dumbbell className="w-5 h-5 text-white" strokeWidth={2} />
+              </div>
+              <span className="text-xl font-bold text-white">Entraînements</span>
+            </div>
+            <Button
+              data-testid="add-workout-btn"
+              onClick={() => setShowAddDialog(true)}
+              className="bg-white text-purple-600 hover:bg-purple-50 font-semibold shadow"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nouvel exercice
+            </Button>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-light text-foreground mb-2">Mes entraînements</h1>
-            <p className="text-sm text-muted-foreground font-light">Suivi de tes performances</p>
-          </div>
-          <Button
-            data-testid="add-workout-btn"
-            onClick={() => setShowAddDialog(true)}
-            className="bg-primary hover:bg-primary/90"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Nouvel exercice
-          </Button>
-        </div>
-
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Statistiques */}
         <div className="grid md:grid-cols-3 gap-4 mb-8">
-          <Card className="p-6 bg-white border border-border">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Exercices (7j)</p>
-            <p className="text-3xl font-light text-primary">{stats.totalWorkouts}</p>
+          <Card className="p-6 bg-gradient-to-br from-purple-500 to-indigo-600 border-0 shadow-lg rounded-2xl">
+            <p className="text-xs uppercase tracking-wide text-white/80 mb-2 font-semibold">Exercices (7j)</p>
+            <p className="text-4xl font-bold text-white">{stats.totalWorkouts}</p>
           </Card>
-          <Card className="p-6 bg-white border border-border">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Séries totales</p>
-            <p className="text-3xl font-light text-primary">{stats.totalSets}</p>
+          <Card className="p-6 bg-gradient-to-br from-blue-500 to-cyan-600 border-0 shadow-lg rounded-2xl">
+            <p className="text-xs uppercase tracking-wide text-white/80 mb-2 font-semibold">Séries totales</p>
+            <p className="text-4xl font-bold text-white">{stats.totalSets}</p>
           </Card>
-          <Card className="p-6 bg-white border border-border">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Répétitions</p>
-            <p className="text-3xl font-light text-primary">{stats.totalReps}</p>
+          <Card className="p-6 bg-gradient-to-br from-orange-500 to-red-600 border-0 shadow-lg rounded-2xl">
+            <p className="text-xs uppercase tracking-wide text-white/80 mb-2 font-semibold">Répétitions</p>
+            <p className="text-4xl font-bold text-white">{stats.totalReps}</p>
           </Card>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Bibliothèque d'exercices */}
-          <Card className="p-6 bg-white border border-border">
+          <Card className="p-6 bg-white border-0 shadow-lg rounded-2xl">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-medium">Bibliothèque d'exercices</h2>
-              <span className="text-sm text-muted-foreground">{EXERCISES_DB.length} exercices</span>
+              <h2 className="text-xl font-bold text-gray-900">💪 Bibliothèque d'exercices</h2>
+              <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">{EXERCISES_DB.length} exercices</span>
             </div>
             
             {/* Recherche et filtres */}
             <div className="space-y-3 mb-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
