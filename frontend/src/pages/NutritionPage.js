@@ -10,10 +10,10 @@ import { toast } from 'sonner';
 import { searchFoods } from '@/data/foodDatabase';
 
 const MEAL_TYPES = [
-  { id: 'petit-dejeuner', name: 'Petit-déjeuner', icon: Coffee, color: 'text-orange-500', bgColor: 'bg-orange-50' },
-  { id: 'dejeuner', name: 'Déjeuner', icon: Sun, color: 'text-yellow-500', bgColor: 'bg-yellow-50' },
-  { id: 'diner', name: 'Dîner', icon: Moon, color: 'text-blue-500', bgColor: 'bg-blue-50' },
-  { id: 'collation', name: 'Collation', icon: Cookie, color: 'text-purple-500', bgColor: 'bg-purple-50' },
+  { id: 'petit-dejeuner', name: 'Petit-déjeuner', icon: Coffee, color: 'text-orange-600', bgColor: 'bg-gradient-to-br from-orange-100 to-amber-50', borderColor: 'border-orange-200' },
+  { id: 'dejeuner', name: 'Déjeuner', icon: Sun, color: 'text-yellow-600', bgColor: 'bg-gradient-to-br from-yellow-100 to-amber-50', borderColor: 'border-yellow-200' },
+  { id: 'diner', name: 'Dîner', icon: Moon, color: 'text-indigo-600', bgColor: 'bg-gradient-to-br from-indigo-100 to-blue-50', borderColor: 'border-indigo-200' },
+  { id: 'collation', name: 'Collation', icon: Cookie, color: 'text-purple-600', bgColor: 'bg-gradient-to-br from-purple-100 to-pink-50', borderColor: 'border-purple-200' },
 ];
 
 export const NutritionPage = () => {
