@@ -94,8 +94,8 @@ export const DashboardPage = () => {
                 <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
                   <User className="w-4 h-4 text-foreground" strokeWidth={1.5} />
                 </div>
-                <span className="hidden sm:inline font-medium">{user.name}</span>
-                {user.is_premium && (
+                <span className="hidden sm:inline font-medium">{currentUser.name}</span>
+                {currentUser.is_premium && (
                   <span className="px-2 py-1 bg-accent/10 text-accent text-xs rounded-full font-medium">Premium</span>
                 )}
               </div>
