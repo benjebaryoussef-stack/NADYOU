@@ -38,25 +38,11 @@ export const OnboardingPage = () => {
   ];
 
   const handleSubmit = async () => {
-    try {
-      await api.updateProfile({
-        sex: formData.sex,
-        age: parseInt(formData.age),
-        height: parseFloat(formData.height),
-        weight: parseFloat(formData.weight),
-        fitness_goal: formData.goal,
-        sport_relation: formData.sport_relation,
-        training_frequency: parseInt(formData.frequency),
-        sleep_hours: parseFloat(formData.sleep_hours),
-        stress_level: formData.stress_level,
-        onboarding_completed: true
-      });
-      await refreshUser();
-      toast.success('Profil complété');
-      setTimeout(() => navigate('/dashboard'), 500);
-    } catch (error) {
-      toast.error('Erreur lors de la sauvegarde');
-    }
+    // Sauvegarder les données dans localStorage pour le mode démo
+    localStorage.setItem('onboardingData', JSON.stringify(formData));
+    localStorage.setItem('onboardingCompleted', 'true');
+    toast.success('Profil complété !');
+    setTimeout(() => navigate('/dashboard'), 500);
   };
 
   const canProceed = () => {
