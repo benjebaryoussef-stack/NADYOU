@@ -1,34 +1,39 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '@/utils/api';
-import { Apple, Plus, ArrowLeft, Search, Loader2 } from 'lucide-react';
+import { Apple, Plus, ArrowLeft, Search, X, Trash2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { searchFoods, FRENCH_FOODS_DB } from '@/data/foodDatabase';
 
 export const NutritionPage = () => {
   const navigate = useNavigate();
-  const [nutritionLogs, setNutritionLogs] = useState([]);
-  const [stats, setStats] = useState(null);
+  
+  // État local pour les repas (stocké dans localStorage)
+  const [meals, setMeals] = useState(() => {
+    const saved = localStorage.getItem('nutritionMeals');
+    return saved ? JSON.parse(saved) : [];
+  });
+  
   const [showAddDialog, setShowAddDialog] = useState(false);
   
-  // Autocomplete states
+  // États pour la recherche
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [searching, setSearching] = useState(false);
   const [selectedFood, setSelectedFood] = useState(null);
-  const [foodDetails, setFoodDetails] = useState(null);
   const [quantity, setQuantity] = useState('100');
   const searchRef = useRef(null);
 
+  // Sauvegarder les repas dans localStorage
   useEffect(() => {
-    loadData();
-  }, []);
+    localStorage.setItem('nutritionMeals', JSON.stringify(meals));
+  }, [meals]);
 
+  // Gérer le clic en dehors du dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -39,118 +44,123 @@ export const NutritionPage = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Recherche en temps réel
   useEffect(() => {
     if (searchQuery.length >= 1 && !selectedFood) {
-      const timer = setTimeout(() => {
-        searchFoods(searchQuery);
-      }, 300);
-      return () => clearTimeout(timer);
-    } else if (searchQuery.length === 0) {
+      const results = searchFoods(searchQuery);
+      setSearchResults(results);
+      setShowDropdown(results.length > 0);
+    } else {
       setSearchResults([]);
       setShowDropdown(false);
     }
-  }, [searchQuery]);
+  }, [searchQuery, selectedFood]);
 
-  const loadData = async () => {
-    try {
-      const [logsRes, statsRes] = await Promise.all([
-        api.getNutrition().catch(() => ({ data: [] })),
-        api.getNutritionStats(7).catch(() => ({ data: null }))
-      ]);
-      setNutritionLogs(logsRes.data);
-      setStats(statsRes.data);
-    } catch (error) {
-      console.error('Error loading nutrition data');
-    }
-  };
-
-  const searchFoods = async (query) => {
-    setSearching(true);
-    try {
-      const res = await api.searchFood(query);
-      setSearchResults(res.data.results || []);
-      setShowDropdown(true);
-    } catch (error) {
-      console.error('Search error:', error);
-      setSearchResults([]);
-    } finally {
-      setSearching(false);
-    }
-  };
-
-  const handleFoodSelect = async (food) => {
-    setSelectedFood(food);
-    setSearchQuery(food.name);
-    setShowDropdown(false);
+  // Calculer les statistiques sur 7 jours
+  const calculateStats = () => {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     
-    // Récupérer les détails nutritionnels
-    try {
-      const res = await api.getFoodDetails(food.fdc_id);
-      setFoodDetails(res.data);
-    } catch (error) {
-      toast.error('Erreur lors de la récupération des données');
-    }
-  };
-
-  const calculateNutrients = () => {
-    if (!foodDetails) return null;
-    
-    const multiplier = parseFloat(quantity) / 100;
-    const nutrients = foodDetails.nutrients;
+    const recentMeals = meals.filter(meal => new Date(meal.date) >= sevenDaysAgo);
     
     return {
-      calories: (nutrients.calories || 0) * multiplier,
-      proteins: (nutrients.proteins || 0) * multiplier,
-      carbs: (nutrients.carbs || 0) * multiplier,
-      fats: (nutrients.fats || 0) * multiplier,
-      leucine: (nutrients.leucine || 0) * multiplier,
-      isoleucine: (nutrients.isoleucine || 0) * multiplier,
-      valine: (nutrients.valine || 0) * multiplier,
+      total_calories: recentMeals.reduce((sum, m) => sum + m.calories, 0),
+      total_proteins: recentMeals.reduce((sum, m) => sum + m.proteins, 0),
+      total_carbs: recentMeals.reduce((sum, m) => sum + m.carbs, 0),
+      total_fats: recentMeals.reduce((sum, m) => sum + m.fats, 0),
+      meal_count: recentMeals.length
     };
   };
 
-  const handleSubmit = async (e) => {
+  const stats = calculateStats();
+
+  // Calculer les nutriments en fonction de la quantité
+  const calculateNutrients = () => {
+    if (!selectedFood) return null;
+    
+    const multiplier = parseFloat(quantity) / 100;
+    
+    return {
+      calories: (selectedFood.calories || 0) * multiplier,
+      proteins: (selectedFood.proteins || 0) * multiplier,
+      carbs: (selectedFood.carbs || 0) * multiplier,
+      fats: (selectedFood.fats || 0) * multiplier,
+      leucine: (selectedFood.leucine || 0) * multiplier,
+      isoleucine: (selectedFood.isoleucine || 0) * multiplier,
+      valine: (selectedFood.valine || 0) * multiplier,
+    };
+  };
+
+  const calculated = calculateNutrients();
+
+  // Sélectionner un aliment
+  const handleFoodSelect = (food) => {
+    setSelectedFood(food);
+    setSearchQuery(food.name);
+    setShowDropdown(false);
+  };
+
+  // Supprimer la sélection (pour changer d'aliment)
+  const handleClearSelection = () => {
+    setSelectedFood(null);
+    setSearchQuery('');
+    setQuantity('100');
+  };
+
+  // Ajouter un repas
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (!selectedFood || !foodDetails) {
+    if (!selectedFood) {
       toast.error('Veuillez sélectionner un aliment');
       return;
     }
 
-    const calculated = calculateNutrients();
+    const calc = calculateNutrients();
     
-    try {
-      const amino_acids = {};
-      if (calculated.leucine > 0) amino_acids.leucine = calculated.leucine;
-      if (calculated.isoleucine > 0) amino_acids.isoleucine = calculated.isoleucine;
-      if (calculated.valine > 0) amino_acids.valine = calculated.valine;
+    const newMeal = {
+      id: Date.now().toString(),
+      food_id: selectedFood.id,
+      meal_name: `${selectedFood.name} (${quantity}g)`,
+      food_name: selectedFood.name,
+      category: selectedFood.category,
+      quantity: parseFloat(quantity),
+      calories: calc.calories,
+      proteins: calc.proteins,
+      carbs: calc.carbs,
+      fats: calc.fats,
+      leucine: calc.leucine,
+      isoleucine: calc.isoleucine,
+      valine: calc.valine,
+      date: new Date().toISOString()
+    };
 
-      await api.createNutrition({
-        meal_name: `${selectedFood.name} (${quantity}g)`,
-        calories: calculated.calories,
-        proteins: calculated.proteins,
-        carbs: calculated.carbs,
-        fats: calculated.fats,
-        amino_acids: Object.keys(amino_acids).length > 0 ? amino_acids : null
-      });
-      
-      toast.success(`${quantity}g de ${selectedFood.name} ajouté !`);
-      resetForm();
-      loadData();
-    } catch (error) {
-      toast.error('Erreur lors de l\'enregistrement');
-    }
+    setMeals(prev => [newMeal, ...prev]);
+    toast.success(`${quantity}g de ${selectedFood.name} ajouté !`);
+    resetForm();
+  };
+
+  // Supprimer un repas
+  const handleDeleteMeal = (mealId) => {
+    setMeals(prev => prev.filter(m => m.id !== mealId));
+    toast.success('Repas supprimé');
+  };
+
+  // Remplacer un repas (ouvre le dialog avec l'aliment pré-sélectionné pour modification)
+  const handleReplaceMeal = (meal) => {
+    // Supprimer l'ancien repas
+    setMeals(prev => prev.filter(m => m.id !== meal.id));
+    // Ouvrir le dialog pour ajouter un nouveau
+    setShowAddDialog(true);
+    toast.info('Sélectionnez un nouvel aliment');
   };
 
   const resetForm = () => {
     setShowAddDialog(false);
     setSearchQuery('');
     setSelectedFood(null);
-    setFoodDetails(null);
     setQuantity('100');
     setSearchResults([]);
   };
-
-  const calculated = foodDetails ? calculateNutrients() : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -191,77 +201,110 @@ export const NutritionPage = () => {
           </Button>
         </div>
 
-        {stats && (
-          <div className="grid md:grid-cols-4 gap-6 mb-12">
-            <Card data-testid="stat-calories" className="p-8 bg-white border border-border">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium">Calories (7j)</p>
-              <p className="text-4xl font-light text-foreground">
-                {Math.round(stats.total_calories)}
-              </p>
-            </Card>
-            <Card data-testid="stat-proteins" className="p-8 bg-white border border-border">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium">Protéines (7j)</p>
-              <p className="text-4xl font-light text-foreground">
-                {Math.round(stats.total_proteins)}<span className="text-xl text-muted-foreground">g</span>
-              </p>
-            </Card>
-            <Card data-testid="stat-carbs" className="p-8 bg-white border border-border">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium">Glucides (7j)</p>
-              <p className="text-4xl font-light text-foreground">
-                {Math.round(stats.total_carbs)}<span className="text-xl text-muted-foreground">g</span>
-              </p>
-            </Card>
-            <Card data-testid="stat-fats" className="p-8 bg-white border border-border">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium">Lipides (7j)</p>
-              <p className="text-4xl font-light text-foreground">
-                {Math.round(stats.total_fats)}<span className="text-xl text-muted-foreground">g</span>
-              </p>
-            </Card>
-          </div>
-        )}
+        {/* Statistiques */}
+        <div className="grid md:grid-cols-4 gap-6 mb-12">
+          <Card data-testid="stat-calories" className="p-8 bg-white border border-border">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium">Calories (7j)</p>
+            <p className="text-4xl font-light text-foreground">
+              {Math.round(stats.total_calories)}
+            </p>
+          </Card>
+          <Card data-testid="stat-proteins" className="p-8 bg-white border border-border">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium">Protéines (7j)</p>
+            <p className="text-4xl font-light text-foreground">
+              {Math.round(stats.total_proteins)}<span className="text-xl text-muted-foreground">g</span>
+            </p>
+          </Card>
+          <Card data-testid="stat-carbs" className="p-8 bg-white border border-border">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium">Glucides (7j)</p>
+            <p className="text-4xl font-light text-foreground">
+              {Math.round(stats.total_carbs)}<span className="text-xl text-muted-foreground">g</span>
+            </p>
+          </Card>
+          <Card data-testid="stat-fats" className="p-8 bg-white border border-border">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 font-medium">Lipides (7j)</p>
+            <p className="text-4xl font-light text-foreground">
+              {Math.round(stats.total_fats)}<span className="text-xl text-muted-foreground">g</span>
+            </p>
+          </Card>
+        </div>
 
+        {/* Historique des repas */}
         <Card data-testid="nutrition-logs" className="p-8 bg-white border border-border">
-          <h2 className="text-xl font-medium mb-6">Historique</h2>
+          <h2 className="text-xl font-medium mb-6">Historique des repas</h2>
           <div className="space-y-4">
-            {nutritionLogs.map((log, idx) => (
+            {meals.map((meal) => (
               <div
-                key={idx}
-                data-testid={`nutrition-log-${idx}`}
-                className="p-6 bg-secondary/30 rounded-lg border border-border"
+                key={meal.id}
+                data-testid={`nutrition-log-${meal.id}`}
+                className="p-6 bg-secondary/30 rounded-lg border border-border hover:border-primary/30 transition-colors"
               >
                 <div className="flex justify-between items-start mb-4">
-                  <h3 className="font-medium">{log.meal_name}</h3>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(log.date).toLocaleDateString('fr-FR')}
-                  </span>
+                  <div>
+                    <h3 className="font-medium text-foreground">{meal.meal_name}</h3>
+                    <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-full">
+                      {meal.category}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground mr-2">
+                      {new Date(meal.date).toLocaleDateString('fr-FR', { 
+                        day: 'numeric', 
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleReplaceMeal(meal)}
+                      className="text-muted-foreground hover:text-primary h-8 w-8 p-0"
+                      title="Remplacer"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteMeal(meal.id)}
+                      className="text-muted-foreground hover:text-destructive h-8 w-8 p-0"
+                      title="Supprimer"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>
                     <span className="text-muted-foreground font-light">Calories</span>
-                    <span className="ml-2 text-primary font-medium">{Math.round(log.calories)}</span>
+                    <span className="ml-2 text-primary font-medium">{Math.round(meal.calories)}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground font-light">Protéines</span>
-                    <span className="ml-2 text-primary font-medium">{Math.round(log.proteins)}g</span>
+                    <span className="ml-2 text-primary font-medium">{Math.round(meal.proteins)}g</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground font-light">Glucides</span>
-                    <span className="ml-2 text-primary font-medium">{Math.round(log.carbs)}g</span>
+                    <span className="ml-2 text-primary font-medium">{Math.round(meal.carbs)}g</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground font-light">Lipides</span>
-                    <span className="ml-2 text-primary font-medium">{Math.round(log.fats)}g</span>
+                    <span className="ml-2 text-primary font-medium">{Math.round(meal.fats)}g</span>
                   </div>
                 </div>
               </div>
             ))}
-            {nutritionLogs.length === 0 && (
-              <p className="text-muted-foreground text-center py-12 font-light">Aucun repas enregistré</p>
+            {meals.length === 0 && (
+              <p className="text-muted-foreground text-center py-12 font-light">
+                Aucun repas enregistré. Cliquez sur "Ajouter un repas" pour commencer.
+              </p>
             )}
           </div>
         </Card>
       </main>
 
+      {/* Dialog pour ajouter un repas */}
       <Dialog open={showAddDialog} onOpenChange={(open) => { setShowAddDialog(open); if (!open) resetForm(); }}>
         <DialogContent 
           data-testid="add-meal-dialog" 
@@ -276,6 +319,7 @@ export const NutritionPage = () => {
           </p>
           
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Barre de recherche */}
             <div className="relative" ref={searchRef}>
               <Label className="text-sm font-medium mb-2 block">Rechercher un aliment</Label>
               <div className="relative">
@@ -285,18 +329,28 @@ export const NutritionPage = () => {
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
-                    setSelectedFood(null);
-                    setFoodDetails(null);
+                    if (selectedFood) {
+                      setSelectedFood(null);
+                    }
                   }}
-                  placeholder="Tapez une lettre (ex: b, p, r...)"
+                  placeholder="Tapez pour rechercher (ex: poulet, riz, banane...)"
                   className="pl-10 pr-10 text-lg"
                   autoComplete="off"
                 />
-                {searching && (
-                  <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-primary animate-spin" />
+                {selectedFood && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClearSelection}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
                 )}
               </div>
               
+              {/* Dropdown des résultats */}
               {showDropdown && searchResults.length > 0 && (
                 <div 
                   data-testid="food-dropdown"
@@ -304,41 +358,49 @@ export const NutritionPage = () => {
                 >
                   {searchResults.map((food, idx) => (
                     <div
-                      key={idx}
+                      key={food.id}
                       data-testid={`food-result-${idx}`}
                       onClick={() => handleFoodSelect(food)}
                       className="p-4 hover:bg-primary/5 cursor-pointer border-b border-border last:border-b-0 transition-colors"
                     >
-                      <p className="font-medium text-foreground">{food.name}</p>
-                      {food.brand && (
-                        <p className="text-xs text-muted-foreground mt-1">{food.brand}</p>
-                      )}
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-foreground">{food.name}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{food.category}</p>
+                        </div>
+                        <div className="text-right text-xs text-muted-foreground">
+                          <p>{food.calories} kcal</p>
+                          <p>{food.proteins}g prot.</p>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
               )}
               
-              {showDropdown && searchResults.length === 0 && searchQuery.length >= 1 && !searching && (
+              {showDropdown && searchResults.length === 0 && searchQuery.length >= 1 && (
                 <div className="absolute z-50 w-full mt-2 bg-white border border-border rounded-lg shadow-xl p-4">
                   <p className="text-sm text-muted-foreground text-center">Aucun résultat trouvé</p>
                 </div>
               )}
             </div>
 
-            {selectedFood && foodDetails && (
+            {/* Détails de l'aliment sélectionné */}
+            {selectedFood && (
               <div className="space-y-6 p-6 bg-primary/5 rounded-lg border border-primary/20">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium text-foreground">{selectedFood.name}</h3>
+                  <div>
+                    <h3 className="text-lg font-medium text-foreground">{selectedFood.name}</h3>
+                    <p className="text-sm text-muted-foreground">{selectedFood.category}</p>
+                  </div>
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    onClick={() => {
-                      setSelectedFood(null);
-                      setFoodDetails(null);
-                      setSearchQuery('');
-                    }}
+                    onClick={handleClearSelection}
+                    className="text-muted-foreground"
                   >
+                    <RefreshCw className="w-4 h-4 mr-2" />
                     Changer
                   </Button>
                 </div>
@@ -356,9 +418,10 @@ export const NutritionPage = () => {
                   />
                 </div>
 
+                {/* Valeurs nutritionnelles calculées */}
                 <div className="space-y-4 pt-4 border-t border-border">
                   <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                    Valeurs nutritionnelles calculées
+                    Valeurs nutritionnelles pour {quantity}g
                   </h4>
                   
                   <div className="grid grid-cols-2 gap-4">
@@ -388,6 +451,7 @@ export const NutritionPage = () => {
                     </div>
                   </div>
 
+                  {/* Acides aminés BCAA */}
                   {calculated && (calculated.leucine > 0 || calculated.isoleucine > 0 || calculated.valine > 0) && (
                     <div className="pt-4 border-t border-border">
                       <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
@@ -428,9 +492,18 @@ export const NutritionPage = () => {
             )}
 
             {!selectedFood && (
-              <p className="text-sm text-muted-foreground text-center py-8 font-light italic">
-                Commencez à taper pour voir les suggestions...
-              </p>
+              <div className="text-center py-8">
+                <p className="text-sm text-muted-foreground font-light italic mb-4">
+                  Commencez à taper pour voir les suggestions...
+                </p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <span className="text-xs bg-secondary px-3 py-1 rounded-full">poulet</span>
+                  <span className="text-xs bg-secondary px-3 py-1 rounded-full">riz</span>
+                  <span className="text-xs bg-secondary px-3 py-1 rounded-full">banane</span>
+                  <span className="text-xs bg-secondary px-3 py-1 rounded-full">œufs</span>
+                  <span className="text-xs bg-secondary px-3 py-1 rounded-full">saumon</span>
+                </div>
+              </div>
             )}
           </form>
         </DialogContent>
