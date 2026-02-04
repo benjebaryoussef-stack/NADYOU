@@ -23,14 +23,19 @@ export const DashboardPage = () => {
   const [nutritionStats, setNutritionStats] = useState(null);
   const [inspirationalPhrase] = useState(INSPIRATIONAL_PHRASES[Math.floor(Math.random() * INSPIRATIONAL_PHRASES.length)]);
 
-  // DEV MODE - Skip auth check
-  const mockUser = user || { name: 'Dev User', is_premium: true, onboarding_completed: true };
+  // Mode démo - utiliser les données de l'onboarding
+  const onboardingData = JSON.parse(localStorage.getItem('onboardingData') || '{}');
+  const demoUser = {
+    name: 'Utilisateur',
+    is_premium: false,
+    onboarding_completed: true,
+    ...onboardingData
+  };
+  const currentUser = user || demoUser;
 
   useEffect(() => {
-    if (user) {
-      loadStats();
-    }
-  }, [user]);
+    loadStats();
+  }, []);
 
   const loadStats = async () => {
     try {
