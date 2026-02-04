@@ -71,12 +71,6 @@ export const DashboardPage = () => {
     );
   }
 
-  // Vérifier si l'onboarding est complété
-  const onboardingCompleted = localStorage.getItem('onboardingCompleted');
-  if (!user && !onboardingCompleted) {
-    return <Navigate to="/onboarding" />;
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <nav className="border-b border-border bg-white/50 backdrop-blur-xl sticky top-0 z-50">
