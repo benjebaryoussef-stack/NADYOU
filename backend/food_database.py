@@ -115,8 +115,9 @@ FRENCH_FOODS_DB = [
     {"id":"tofu","name":"Tofu","category":"Végétal","unit":"100g","calories":76,"proteins":8,"carbs":1.9,"fats":4.8,"leucine":0.6},
     {"id":"tempeh","name":"Tempeh","category":"Végétal","unit":"100g","calories":193,"proteins":19,"carbs":9,"fats":11,"leucine":1.4},
     {"id":"lentilles","name":"Lentilles cuites","category":"Végétal","unit":"100g","calories":116,"proteins":9,"carbs":20,"fats":0.4,"leucine":0.7},
-    {"id":"pois-chiches","name":"Pois chiches","category":"Végétal","unit":"100g","calories":164,"proteins":9,"carbs":27,"fats":2.6,"leucine":0.6}   
+    {"id":"pois-chiches","name":"Pois chiches","category":"Végétal","unit":"100g","calories":164,"proteins":9,"carbs":27,"fats":2.6,"leucine":0.6},
 
     # Compléments
     {"id":"whey","name":"Whey protéine","category":"Suppléments","unit":"100g","calories":400,"proteins":80,"carbs":7,"fats":6,"leucine":8.6},
-    {"id":"caseine","name":"Caséine","category":"Suppléments","unit":"100g","calories":360,"proteins":78,"carbs":8,"fats":3,"leucine":8.0} ,
+    {"id":"caseine","name":"Caséine","category":"Suppléments","unit":"100g","calories":360,"proteins":78,"carbs":8,"fats":3,"leucine":8.0}
+]
