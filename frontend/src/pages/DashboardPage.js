@@ -173,7 +173,7 @@ export const DashboardPage = () => {
           </Card>
         </div>
 
-        {!user.is_premium && (
+        {!currentUser.is_premium && (
           <Card data-testid="premium-upsell" className="p-10 bg-gradient-to-br from-accent/5 via-white to-accent/5 border border-accent/20 mb-12 slide-up">
             <div className="flex items-start justify-between">
               <div className="flex-1">
