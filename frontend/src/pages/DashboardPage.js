@@ -53,7 +53,9 @@ export const DashboardPage = () => {
   };
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem('onboardingData');
+    localStorage.removeItem('onboardingCompleted');
+    if (logout) logout();
     toast.success('À bientôt');
     navigate('/');
   };
@@ -69,8 +71,10 @@ export const DashboardPage = () => {
     );
   }
 
-  if (!user) {
-    return <Navigate to="/login" />;
+  // Vérifier si l'onboarding est complété
+  const onboardingCompleted = localStorage.getItem('onboardingCompleted');
+  if (!user && !onboardingCompleted) {
+    return <Navigate to="/onboarding" />;
   }
 
   return (
