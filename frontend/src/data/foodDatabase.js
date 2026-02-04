@@ -315,34 +315,46 @@ export const FRENCH_FOODS_DB = [
   { id: "gainer", name: "Gainer", category: "Suppléments", calories: 400, proteins: 25, carbs: 65, fats: 5, leucine: 2.5, isoleucine: 1.3, valine: 1.5 },
 ];
 
-// Fonction de recherche dans la base de données
-export const searchFoods = (query) => {
-  if (!query || query.length < 1) return [];
-  
-  // Normaliser la requête : enlever accents et remplacer œ par oe
-  const normalizedQuery = query
+// Fonction pour normaliser le texte (accents, œ, æ)
+const normalizeText = (text) => {
+  return text
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/œ/g, "oe")
     .replace(/æ/g, "ae");
+};
+
+// Fonction de recherche dans la base de données
+export const searchFoods = (query) => {
+  if (!query || query.length < 1) return [];
   
-  return FRENCH_FOODS_DB.filter(food => {
-    // Normaliser le nom : enlever accents et remplacer œ par oe
-    const normalizedName = food.name
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/œ/g, "oe")
-      .replace(/æ/g, "ae");
-    const normalizedCategory = food.category
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/œ/g, "oe")
-      .replace(/æ/g, "ae");
+  const normalizedQuery = normalizeText(query);
+  
+  // Filtrer les aliments qui correspondent
+  const matches = FRENCH_FOODS_DB.filter(food => {
+    const normalizedName = normalizeText(food.name);
+    const normalizedCategory = normalizeText(food.category);
     return normalizedName.includes(normalizedQuery) || normalizedCategory.includes(normalizedQuery);
-  }).slice(0, 15); // Limiter à 15 résultats
+  });
+  
+  // Trier : d'abord ceux qui COMMENCENT par la requête, puis par ordre alphabétique
+  matches.sort((a, b) => {
+    const nameA = normalizeText(a.name);
+    const nameB = normalizeText(b.name);
+    
+    const startsWithA = nameA.startsWith(normalizedQuery);
+    const startsWithB = nameB.startsWith(normalizedQuery);
+    
+    // Priorité à ceux qui commencent par la requête
+    if (startsWithA && !startsWithB) return -1;
+    if (!startsWithA && startsWithB) return 1;
+    
+    // Ensuite tri alphabétique
+    return nameA.localeCompare(nameB);
+  });
+  
+  return matches.slice(0, 15); // Limiter à 15 résultats
 };
 
 // Fonction pour obtenir les détails d'un aliment par ID
