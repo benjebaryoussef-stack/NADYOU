@@ -127,13 +127,30 @@ export const FRENCH_FOODS_DB = [
 export const searchFoods = (query) => {
   if (!query || query.length < 1) return [];
   
-  const normalizedQuery = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  // Normaliser la requête : enlever accents et remplacer œ par oe
+  const normalizedQuery = query
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/œ/g, "oe")
+    .replace(/æ/g, "ae");
   
   return FRENCH_FOODS_DB.filter(food => {
-    const normalizedName = food.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const normalizedCategory = food.category.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    // Normaliser le nom : enlever accents et remplacer œ par oe
+    const normalizedName = food.name
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/œ/g, "oe")
+      .replace(/æ/g, "ae");
+    const normalizedCategory = food.category
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/œ/g, "oe")
+      .replace(/æ/g, "ae");
     return normalizedName.includes(normalizedQuery) || normalizedCategory.includes(normalizedQuery);
-  }).slice(0, 10); // Limiter à 10 résultats
+  }).slice(0, 15); // Limiter à 15 résultats
 };
 
 // Fonction pour obtenir les détails d'un aliment par ID
