@@ -7,12 +7,7 @@ export const FRENCH_FOODS_DB = [
   { id: "dinde", name: "Dinde", category: "Viandes", calories: 135, proteins: 30, carbs: 0, fats: 1, leucine: 2.4, isoleucine: 1.3, valine: 1.4 },
   { id: "boeuf-hache", name: "Bœuf haché", category: "Viandes", calories: 250, proteins: 26, carbs: 0, fats: 15, leucine: 2.1, isoleucine: 1.2, valine: 1.3 },
   { id: "steak", name: "Steak", category: "Viandes", calories: 271, proteins: 25, carbs: 0, fats: 19, leucine: 2.0, isoleucine: 1.1, valine: 1.2 },
-  { id: "jambon-blanc", name: "Jambon blanc", category: "Viandes", calories: 145, proteins: 19, carbs: 1.5, fats: 6, leucine: 1.5, isoleucine: 0.9, valine: 1.0 },
-  { id: "jambon-cru", name: "Jambon cru", category: "Viandes", calories: 145, proteins: 21, carbs: 0, fats: 6.5, leucine: 1.7, isoleucine: 1.0, valine: 1.1 },
-  { id: "bacon", name: "Bacon", category: "Viandes", calories: 541, proteins: 37, carbs: 1.4, fats: 42, leucine: 2.8, isoleucine: 1.5, valine: 1.7 },
   { id: "saucisse-poulet", name: "Saucisse de poulet", category: "Viandes", calories: 195, proteins: 16, carbs: 3, fats: 13, leucine: 1.3, isoleucine: 0.8, valine: 0.9 },
-  { id: "saucisse-porc", name: "Saucisse de porc", category: "Viandes", calories: 301, proteins: 13, carbs: 1.5, fats: 27, leucine: 1.1, isoleucine: 0.6, valine: 0.7 },
-  { id: "filet-mignon", name: "Filet mignon", category: "Viandes", calories: 143, proteins: 26, carbs: 0, fats: 4, leucine: 2.1, isoleucine: 1.2, valine: 1.3 },
   { id: "cotelettes-agneau", name: "Côtelettes d'agneau", category: "Viandes", calories: 294, proteins: 25, carbs: 0, fats: 21, leucine: 2.0, isoleucine: 1.1, valine: 1.2 },
   { id: "foie-veau", name: "Foie de veau", category: "Viandes", calories: 140, proteins: 20, carbs: 3.9, fats: 4.8, leucine: 1.6, isoleucine: 0.9, valine: 1.1 },
 
