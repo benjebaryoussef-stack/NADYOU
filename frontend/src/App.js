@@ -24,12 +24,12 @@ function App() {
       <div className="App">
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<OnboardingPage />} />
-            <Route path="/login" element={<OnboardingPage />} />
-            <Route path="/register" element={<OnboardingPage />} />
-            <Route path="/forgot-password" element={<OnboardingPage />} />
-            <Route path="/reset-password" element={<OnboardingPage />} />
-            <Route path="/onboarding" element={<OnboardingPage />} />
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/login" element={<DashboardPage />} />
+            <Route path="/register" element={<DashboardPage />} />
+            <Route path="/forgot-password" element={<DashboardPage />} />
+            <Route path="/reset-password" element={<DashboardPage />} />
+            <Route path="/onboarding" element={<DashboardPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/workouts" element={<WorkoutsPage />} />
             <Route path="/nutrition" element={<NutritionPage />} />
