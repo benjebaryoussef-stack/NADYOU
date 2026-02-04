@@ -213,71 +213,115 @@ export const NutritionPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <nav className="border-b border-border bg-white/50 backdrop-blur-xl sticky top-0 z-50">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header coloré */}
+      <nav className="bg-gradient-to-r from-green-500 via-emerald-600 to-teal-600 shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-16 gap-4">
-            <Button
-              data-testid="back-to-dashboard-btn"
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/dashboard')}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" strokeWidth={1.5} />
-              Retour
-            </Button>
-            <div className="flex items-center gap-2">
-              <Apple className="w-6 h-6 text-primary" strokeWidth={1.5} />
-              <span className="text-lg font-medium">Nutrition</span>
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
+              <Button
+                data-testid="back-to-dashboard-btn"
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/dashboard')}
+                className="text-white/80 hover:text-white hover:bg-white/10"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" strokeWidth={2} />
+                Retour
+              </Button>
             </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                <Apple className="w-5 h-5 text-white" strokeWidth={2} />
+              </div>
+              <span className="text-xl font-bold text-white">Nutrition</span>
+            </div>
+            <Button
+              data-testid="add-meal-btn"
+              onClick={() => setShowAddDialog(true)}
+              className="bg-white text-green-600 hover:bg-green-50 font-semibold shadow"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Ajouter un repas
+            </Button>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-light text-foreground mb-2">Ma nutrition</h1>
-            <p className="text-sm text-muted-foreground font-light">Suivi quotidien des macronutriments</p>
-          </div>
-          <Button
-            data-testid="add-meal-btn"
-            onClick={() => setShowAddDialog(true)}
-            className="bg-primary hover:bg-primary/90"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Ajouter un repas
-          </Button>
-        </div>
-
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Objectifs du jour avec barres de progression */}
-        <Card className="p-6 bg-white border border-border mb-8">
-          <h2 className="text-lg font-medium mb-4">Objectifs du jour</h2>
+        <Card className="p-6 bg-white border-0 shadow-xl rounded-2xl mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-6">🎯 Objectifs du jour</h2>
           <div className="grid md:grid-cols-4 gap-6">
             {/* Calories */}
-            <div>
+            <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Calories</span>
-                <span className="font-medium">{Math.round(todayStats.calories)} / {goals.calories}</span>
+                <span className="font-medium text-gray-700">Calories</span>
+                <span className="font-bold text-orange-600">{Math.round(todayStats.calories)} / {goals.calories}</span>
               </div>
-              <div className="h-3 bg-secondary rounded-full overflow-hidden">
+              <div className="h-3 bg-white rounded-full overflow-hidden shadow-inner">
                 <div 
-                  className={`h-full ${getProgressColor(getProgressPercent(todayStats.calories, goals.calories))} transition-all duration-500`}
+                  className="h-full bg-gradient-to-r from-orange-400 to-red-500 transition-all duration-500 rounded-full"
                   style={{ width: `${getProgressPercent(todayStats.calories, goals.calories)}%` }}
                 />
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {Math.round(goals.calories - todayStats.calories)} restantes
+              <p className="text-xs text-gray-500 mt-2">
+                {Math.max(0, Math.round(goals.calories - todayStats.calories))} restantes
               </p>
             </div>
 
             {/* Protéines */}
-            <div>
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Protéines</span>
-                <span className="font-medium">{Math.round(todayStats.proteins)}g / {goals.proteins}g</span>
+                <span className="font-medium text-gray-700">Protéines</span>
+                <span className="font-bold text-blue-600">{Math.round(todayStats.proteins)}g / {goals.proteins}g</span>
               </div>
+              <div className="h-3 bg-white rounded-full overflow-hidden shadow-inner">
+                <div 
+                  className="h-full bg-gradient-to-r from-blue-400 to-indigo-500 transition-all duration-500 rounded-full"
+                  style={{ width: `${getProgressPercent(todayStats.proteins, goals.proteins)}%` }}
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                {Math.max(0, Math.round(goals.proteins - todayStats.proteins))}g restants
+              </p>
+            </div>
+
+            {/* Glucides */}
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4">
+              <div className="flex justify-between text-sm mb-2">
+                <span className="font-medium text-gray-700">Glucides</span>
+                <span className="font-bold text-green-600">{Math.round(todayStats.carbs)}g / {goals.carbs}g</span>
+              </div>
+              <div className="h-3 bg-white rounded-full overflow-hidden shadow-inner">
+                <div 
+                  className="h-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-500 rounded-full"
+                  style={{ width: `${getProgressPercent(todayStats.carbs, goals.carbs)}%` }}
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                {Math.max(0, Math.round(goals.carbs - todayStats.carbs))}g restants
+              </p>
+            </div>
+
+            {/* Lipides */}
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4">
+              <div className="flex justify-between text-sm mb-2">
+                <span className="font-medium text-gray-700">Lipides</span>
+                <span className="font-bold text-purple-600">{Math.round(todayStats.fats)}g / {goals.fats}g</span>
+              </div>
+              <div className="h-3 bg-white rounded-full overflow-hidden shadow-inner">
+                <div 
+                  className="h-full bg-gradient-to-r from-purple-400 to-pink-500 transition-all duration-500 rounded-full"
+                  style={{ width: `${getProgressPercent(todayStats.fats, goals.fats)}%` }}
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                {Math.max(0, Math.round(goals.fats - todayStats.fats))}g restants
+              </p>
+            </div>
+          </div>
+        </Card>
               <div className="h-3 bg-secondary rounded-full overflow-hidden">
                 <div 
                   className={`h-full ${getProgressColor(getProgressPercent(todayStats.proteins, goals.proteins))} transition-all duration-500`}
