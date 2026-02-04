@@ -116,7 +116,7 @@ export const DashboardPage = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-12 fade-in">
           <h1 className="text-4xl font-light text-foreground mb-3 tracking-tight">
-            Bonjour, {user.name}
+            Bonjour, {currentUser.name}
           </h1>
           <p className="text-lg text-muted-foreground font-light italic">
             "{inspirationalPhrase}"
