@@ -322,55 +322,9 @@ export const NutritionPage = () => {
             </div>
           </div>
         </Card>
-              <div className="h-3 bg-secondary rounded-full overflow-hidden">
-                <div 
-                  className={`h-full ${getProgressColor(getProgressPercent(todayStats.proteins, goals.proteins))} transition-all duration-500`}
-                  style={{ width: `${getProgressPercent(todayStats.proteins, goals.proteins)}%` }}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {Math.round(goals.proteins - todayStats.proteins)}g restants
-              </p>
-            </div>
-
-            {/* Glucides */}
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Glucides</span>
-                <span className="font-medium">{Math.round(todayStats.carbs)}g / {goals.carbs}g</span>
-              </div>
-              <div className="h-3 bg-secondary rounded-full overflow-hidden">
-                <div 
-                  className={`h-full ${getProgressColor(getProgressPercent(todayStats.carbs, goals.carbs))} transition-all duration-500`}
-                  style={{ width: `${getProgressPercent(todayStats.carbs, goals.carbs)}%` }}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {Math.round(goals.carbs - todayStats.carbs)}g restants
-              </p>
-            </div>
-
-            {/* Lipides */}
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Lipides</span>
-                <span className="font-medium">{Math.round(todayStats.fats)}g / {goals.fats}g</span>
-              </div>
-              <div className="h-3 bg-secondary rounded-full overflow-hidden">
-                <div 
-                  className={`h-full ${getProgressColor(getProgressPercent(todayStats.fats, goals.fats))} transition-all duration-500`}
-                  style={{ width: `${getProgressPercent(todayStats.fats, goals.fats)}%` }}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {Math.round(goals.fats - todayStats.fats)}g restants
-              </p>
-            </div>
-          </div>
-        </Card>
 
         {/* Repas du jour par type */}
-        <h2 className="text-xl font-medium mb-4">Repas du jour</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">🍽️ Repas du jour</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {MEAL_TYPES.map(mealType => {
             const MealIcon = mealType.icon;
@@ -379,24 +333,26 @@ export const NutritionPage = () => {
             const typeProteins = typeMeals.reduce((sum, m) => sum + m.proteins, 0);
 
             return (
-              <Card key={mealType.id} className={`p-4 border border-border ${mealType.bgColor}`}>
+              <Card key={mealType.id} className={`p-4 border-0 shadow-lg rounded-xl ${mealType.bgColor}`}>
                 <div className="flex items-center gap-2 mb-3">
-                  <MealIcon className={`w-5 h-5 ${mealType.color}`} />
-                  <h3 className="font-medium">{mealType.name}</h3>
+                  <div className={`w-8 h-8 rounded-lg bg-white/60 flex items-center justify-center`}>
+                    <MealIcon className={`w-4 h-4 ${mealType.color}`} />
+                  </div>
+                  <h3 className="font-bold text-gray-800">{mealType.name}</h3>
                 </div>
                 
                 {typeMeals.length > 0 ? (
                   <div className="space-y-2">
                     {typeMeals.map(meal => (
-                      <div key={meal.id} className="flex justify-between items-center text-sm bg-white/50 rounded p-2">
-                        <span className="truncate flex-1">{meal.food_name}</span>
+                      <div key={meal.id} className="flex justify-between items-center text-sm bg-white/70 rounded-lg p-2">
+                        <span className="truncate flex-1 font-medium text-gray-700">{meal.food_name}</span>
                         <div className="flex items-center gap-1">
-                          <span className="text-muted-foreground">{Math.round(meal.calories)} kcal</span>
+                          <span className="text-gray-500 text-xs">{Math.round(meal.calories)} kcal</span>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDeleteMeal(meal.id)}
-                            className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                            className="h-6 w-6 p-0 text-gray-400 hover:text-red-500"
                           >
                             <X className="w-3 h-3" />
                           </Button>
