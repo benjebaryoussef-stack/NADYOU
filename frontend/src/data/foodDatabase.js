@@ -67,7 +67,13 @@ export const FRENCH_FOODS_DB = [
   { id: "ananas", name: "Ananas", category: "Fruits", calories: 50, proteins: 0.5, carbs: 13, fats: 0.1, leucine: 0.02, isoleucine: 0.01, valine: 0.02 },
 
   // Produits laitiers / Œufs
-  { id: "oeufs", name: "Œufs", category: "Produits laitiers", calories: 155, proteins: 13, carbs: 1.1, fats: 11, leucine: 1.1, isoleucine: 0.7, valine: 0.9 },
+  { id: "oeufs", name: "Œufs", category: "Œufs", calories: 155, proteins: 13, carbs: 1.1, fats: 11, leucine: 1.1, isoleucine: 0.7, valine: 0.9 },
+  { id: "oeuf-dur", name: "Œuf dur", category: "Œufs", calories: 155, proteins: 13, carbs: 1.1, fats: 11, leucine: 1.1, isoleucine: 0.7, valine: 0.9 },
+  { id: "oeuf-au-plat", name: "Œuf au plat", category: "Œufs", calories: 196, proteins: 14, carbs: 1, fats: 15, leucine: 1.2, isoleucine: 0.8, valine: 1.0 },
+  { id: "blanc-oeuf", name: "Blanc d'œuf", category: "Œufs", calories: 52, proteins: 11, carbs: 0.7, fats: 0.2, leucine: 0.9, isoleucine: 0.6, valine: 0.7 },
+  { id: "jaune-oeuf", name: "Jaune d'œuf", category: "Œufs", calories: 322, proteins: 16, carbs: 3.6, fats: 27, leucine: 1.4, isoleucine: 0.9, valine: 1.1 },
+  { id: "omelette", name: "Omelette", category: "Œufs", calories: 154, proteins: 11, carbs: 0.6, fats: 12, leucine: 1.0, isoleucine: 0.6, valine: 0.8 },
+  { id: "oeufs-brouilles", name: "Œufs brouillés", category: "Œufs", calories: 149, proteins: 10, carbs: 1.6, fats: 11, leucine: 0.9, isoleucine: 0.6, valine: 0.7 },
   { id: "fromage-blanc", name: "Fromage blanc", category: "Produits laitiers", calories: 47, proteins: 8, carbs: 3.5, fats: 0.2, leucine: 0.8, isoleucine: 0.5, valine: 0.6 },
   { id: "yaourt-nature", name: "Yaourt nature", category: "Produits laitiers", calories: 61, proteins: 3.5, carbs: 4.7, fats: 3.3, leucine: 0.3, isoleucine: 0.2, valine: 0.2 },
   { id: "lait-entier", name: "Lait entier", category: "Produits laitiers", calories: 61, proteins: 3.2, carbs: 4.8, fats: 3.3, leucine: 0.3, isoleucine: 0.2, valine: 0.2 },
